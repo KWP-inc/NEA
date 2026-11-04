@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, CalendarHeart, Camera, Check, ImageUp, Loader2, RotateCcw, ScanFace, ShieldCheck } from "lucide-react";
 import { NeaSiIcon } from "@/components/brand/nea-si-icon";
+import { openLiveScan } from "@/components/scan/open-live-scan";
 import { NeaImage } from "@/components/ui/nea-image";
 import { LoopVideo } from "@/components/ui/loop-video";
 import { useBooking } from "@/components/booking/booking";
@@ -48,6 +49,9 @@ export function SkinLens() {
     stream.current = null;
   };
   useEffect(() => stop, []);
+  useEffect(() => {
+    if (window.location.hash === "#live") setTimeout(openLiveScan, 600);
+  }, []);
 
   const analyse = useCallback(async (img: string) => {
     setPhoto(img);
@@ -132,7 +136,18 @@ export function SkinLens() {
                   </li>
                 ))}
               </ol>
-              <label className="mt-6 flex cursor-pointer gap-3 rounded-2xl border border-ink/10 bg-white/70 p-4 text-[13.5px] leading-snug text-ink">
+              <button onClick={openLiveScan} className="group mt-6 flex w-full items-center gap-3 rounded-2xl bg-ink p-4 text-left text-white transition hover:bg-ink/90 active:scale-[0.99]">
+                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white/10">
+                  <ScanFace className="h-5 w-5 text-dermis" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[16px] font-semibold">Live face scan</span>
+                  <span className="block text-[13px] leading-snug text-white/70">Camera on, 20 seconds: heart rate, stress, water, tired eyes and skin, shown on your face. Stays on your phone.</span>
+                </span>
+                <ArrowRight className="h-4 w-4 shrink-0 transition group-hover:translate-x-0.5" />
+              </button>
+              <p className="mt-5 text-[12px] uppercase tracking-[0.14em] text-graphite">Or a photo read by Nea SI</p>
+              <label className="mt-2 flex cursor-pointer gap-3 rounded-2xl border border-ink/10 bg-white/70 p-4 text-[13.5px] leading-snug text-ink">
                 <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-[rgb(var(--c-accent))]" />
                 <span>
                   I agree that my photo is analysed once by Google Gemini to describe visible skin signs. <strong className="font-semibold">NEA does not store it.</strong> This is not a diagnosis.

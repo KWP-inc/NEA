@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Camera } from "lucide-react";
-import { openMirror } from "@/components/face/open-mirror";
+import { openLiveScan } from "@/components/scan/open-live-scan";
 import { cn } from "@/lib/utils";
 
 type Wish = { id: string; label: string; line: string; a: [number, number, number]; b: [number, number, number] };
@@ -264,8 +264,8 @@ export function GlowDrop({ className }: { className?: string }) {
               {w.line}
             </motion.p>
           </AnimatePresence>
-          <button onClick={() => openMirror()} className="mt-4 inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-[14.5px] font-medium text-white shadow-[0_18px_40px_-16px_rgba(var(--shadow-tint),0.8)] transition hover:bg-ink/90 active:scale-[0.97]">
-            <Camera className="h-4 w-4" /> See your skin in the mirror
+          <button onClick={openLiveScan} className="mt-4 inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-[14.5px] font-medium text-white shadow-[0_18px_40px_-16px_rgba(var(--shadow-tint),0.8)] transition hover:bg-ink/90 active:scale-[0.97]">
+            <Camera className="h-4 w-4" /> Scan my face live
           </button>
         </div>
       </div>
