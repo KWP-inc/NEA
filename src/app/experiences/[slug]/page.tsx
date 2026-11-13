@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SkinWeather } from "@/components/glow/skin-weather";
 import { notFound, redirect } from "next/navigation";
 import { Check } from "lucide-react";
 import { NeaImage } from "@/components/ui/nea-image";
@@ -46,6 +47,13 @@ export default async function ExperiencePage({ params }: Props) {
           )}
         </div>
       </section>
+      {o.slug === "calgary-skin" && (
+        <section className="pb-12">
+          <div className="container">
+            <SkinWeather />
+          </div>
+        </section>
+      )}
       <section className="chapter">
         <div className="container grid gap-14 lg:grid-cols-[1.1fr_1fr]">
           <div>
