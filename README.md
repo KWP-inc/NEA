@@ -151,3 +151,20 @@ Tokens last 60 days. `vercel.json` calls `/api/instagram/refresh` every Monday t
 - **Lab store** (`/tests`, `components/sections/test-store.tsx`): all 46 BioAro Labs tests from `content/tests.ts`, searchable by concern and by body system, each with BioAro's own product image, plain-language details and a **Buy now** button that opens that exact test in BioAro's shop (`bioarolabs.com/shop?test=<handle>`), where it goes into BioAro's cart.
 - **Films** (`public/media`): the home hero and the Skin Lens explainer, 720×1280 H.264, silent, played by `components/ui/loop-video.tsx` only while on screen.
 - **No repeated photos**: run `node scripts/check-images.mjs` after changing images; it lists any photo used in more than one place.
+
+## My Glow tools (update 24)
+
+Six everyday tools. All personal data stays on the visitor's own device (`src/lib/glow-store.ts`, localStorage); there are no accounts.
+
+| Tool | Route | Where the logic lives |
+| --- | --- | --- |
+| Skin Diary | `/skin-diary` | Every live face scan is saved automatically (score, readings, a small photo). Trend chart, before and after, history. `components/glow/skin-diary.tsx` |
+| Routine Builder | `/routine` | Add products by barcode (camera, where the browser supports `BarcodeDetector`; typed numbers everywhere), by name, or by type. Rules in `lib/routine.ts` give the morning and night order, clashes and what is missing. Product data: Open Beauty Facts through `api/product` (free, open, incomplete by nature). |
+| Calgary skin forecast | home page, `/experiences/calgary-skin` | `api/skin-weather` reads Open-Meteo (free, no key) every 30 minutes; `lib/skin-weather.ts` turns it into tips (UV, dry air, cold, wind, chinook, heat, smoke). |
+| Injectables Planner | `/injectables` | Areas, typical amounts, duration, recovery and top-up dates in `content/injectables.ts`. Prices only where the booking system publishes one. Calendar reminders via `lib/ics.ts`. |
+| Event Countdown | `/countdown` | `lib/event-plan.ts`: each step has an ideal and a last safe time before the day; steps that are too close are skipped. |
+| Glow Club | `/glow-club` | Points and rewards in `content/club.ts` (**rewards are placeholders: confirm them**). The front desk confirms every reward. Clinic codes come from `CLUB_CODES` (server only). Referral links carry `?ref=CODE`, which travels with form leads as `ref`. |
+
+Also in update 24: security headers (`next.config.mjs`), per-visitor rate limits on the API routes (`lib/rate-limit.ts`), a web app manifest (`app/manifest.ts`), and stricter checks on form leads.
+
+Tested with `bun` logic tests (weather rules, ingredient reading, routine order, event plan, calendar files, API routes with mocked upstreams) and Playwright on phone and desktop. Not testable in the build sandbox: the live Open-Meteo and Open Beauty Facts calls, and camera barcode reading on a real phone.
