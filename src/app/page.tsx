@@ -8,6 +8,7 @@ import { ScanOffer } from "@/components/sections/scan-offer";
 import { SectionHead } from "@/components/sections/page-hero";
 import { FotonaChapter, FounderChapter, ReviewsChapter, VisitChapter } from "@/components/sections/home-chapters";
 import { ReelsStrip } from "@/components/reels/reels-strip";
+import { GlowTools } from "@/components/glow/glow-tools";
 import { bodyRegions, faceZones } from "@/content/body";
 import { programs } from "@/content/programs";
 import { labTests } from "@/content/tests";
@@ -50,6 +51,8 @@ export default function HomePage() {
           <ScanOffer />
         </div>
       </section>
+
+      <GlowTools />
 
       <ReviewsChapter />
       <ReelsStrip />

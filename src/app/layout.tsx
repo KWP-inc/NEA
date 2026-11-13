@@ -9,6 +9,7 @@ import { ReelsProvider } from "@/components/reels/reels";
 import { BrandCorner } from "@/components/layout/brand-corner";
 import { MirrorLazy } from "@/components/face/mirror-lazy";
 import { LiveScanLazy } from "@/components/scan/live-scan-lazy";
+import { RefCapture } from "@/components/glow/ref-capture";
 import { SmoothScroll } from "@/components/layout/smooth-scroll";
 import { JsonLd, clinicSchema } from "@/lib/seo";
 import { site } from "@/lib/site";
@@ -83,6 +84,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Dock />
               <MirrorLazy />
               <LiveScanLazy />
+              <RefCapture />
             </ReelsProvider>
           </AiProvider>
         </BookingProvider>

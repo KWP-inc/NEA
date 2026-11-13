@@ -34,6 +34,11 @@ const KIND_OF: Record<string, Kind> = { Program: "Program", Treatment: "Treatmen
 const PAGES: Hit[] = [
   { id: "p-why", kind: "Page", title: "Why NEA?", href: "/why-nea", text: "why nea different better compare choose difference other clinics medspa reason" },
   { id: "p-lens", kind: "Page", title: "Nea SI Skin Lens (selfie analysis)", href: "/skin-lens", text: "skin lens selfie photo camera ai analysis analyse face scan online instant" },
+  { id: "p-diary", kind: "Page", title: "Skin Diary (track your skin score)", href: "/skin-diary", text: "skin diary track progress score history trend before after weekly scan journal" },
+  { id: "p-routine", kind: "Page", title: "Routine Builder (check your products)", href: "/routine", text: "routine builder products barcode scan ingredients order morning night clash conflict retinol vitamin c spf skincare shelf" },
+  { id: "p-countdown", kind: "Page", title: "Event Countdown (plan for your big day)", href: "/countdown", text: "event countdown wedding bride bridal vacation birthday party graduation photos timeline plan weeks before" },
+  { id: "p-inject", kind: "Page", title: "Injectables Planner", href: "/injectables", text: "injectables planner units syringes how many how long lasts top up top-up lips cheeks forehead frown crow's feet jaw filler wrinkle relaxer" },
+  { id: "p-club", kind: "Page", title: "Glow Club rewards", href: "/glow-club", text: "glow club rewards points loyalty referral refer friend code redeem perks" },
   { id: "p-scan", kind: "Page", title: "Free Skin Health Report", href: "/skin-scan", text: "free skin scan analyzer report face analysis complimentary" },
   { id: "p-book", kind: "Page", title: "Book an appointment", href: "/book", text: "book booking appointment schedule consultation" },
   { id: "p-body", kind: "Page", title: "3D Body Explorer", href: "/body", text: "3d body explorer anatomy organs map regions" },

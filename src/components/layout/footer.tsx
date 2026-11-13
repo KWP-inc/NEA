@@ -42,7 +42,7 @@ export function Footer() {
               </a>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-10 md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-10 md:grid-cols-3 xl:grid-cols-5">
             {footerNav.map((g) => (
               <nav key={g.title} aria-label={g.title}>
                 <p className="mb-4 text-[13px] font-medium text-ink">{g.title}</p>

@@ -22,6 +22,16 @@ export const footerNav: { title: string; links: NavItem[] }[] = [
     ],
   },
   {
+    title: "My Glow",
+    links: [
+      { label: "Skin Diary", href: "/skin-diary" },
+      { label: "Routine Builder", href: "/routine" },
+      { label: "Event Countdown", href: "/countdown" },
+      { label: "Injectables Planner", href: "/injectables" },
+      { label: "Glow Club rewards", href: "/glow-club" },
+    ],
+  },
+  {
     title: "Care",
     links: [
       { label: "Programs", href: "/programs" },
