@@ -1,12 +1,14 @@
 "use client";
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { CalendarHeart, Camera, Droplets, Eye, Flame, Gauge, HeartPulse, Loader2, Palette, RotateCcw, ShieldCheck, Sparkles, Sun, Waves, X } from "lucide-react";
+import { BookHeart, CalendarHeart, Camera, Droplets, Eye, Flame, Gauge, HeartPulse, Loader2, Palette, RotateCcw, ShieldCheck, Sparkles, Sun, Waves, X } from "lucide-react";
 import { NeaSiIcon } from "@/components/brand/nea-si-icon";
 import { useBooking } from "@/components/booking/booking";
 import { useAi } from "@/components/ai/ai-provider";
 import { cameraSupported, loadLandmarker, type Pt } from "@/lib/face-tracker";
 import { BlinkCounter, PatchAverage, PulseMeter, buildReport, readPatch, type MetricKey, type RegionKey, type ScanReport } from "@/lib/skin-signals";
+import { addDiaryEntry, award, thumbnail } from "@/lib/glow-store";
 import { cn } from "@/lib/utils";
 
 type Stage = "intro" | "loading" | "scan" | "result";
@@ -105,6 +107,13 @@ export function LiveScanHost() {
       v.muted = true;
       v.playsInline = true;
       await v.play();
+      // keep the screen awake for the 20 seconds (ignored where the browser doesn't support it)
+      try {
+        const lock = await (navigator as Navigator & { wakeLock?: { request: (t: "screen") => Promise<{ release: () => Promise<void> }> } }).wakeLock?.request("screen");
+        if (lock) stopFns.current.push(() => void lock.release().catch(() => {}));
+      } catch {
+        /* fine without it */
+      }
       // face tracking makes the readings follow your face; if it can't load, an oval guide does the same job
       const lm = await Promise.race([loadLandmarker().catch(() => null), new Promise<null>((r) => setTimeout(() => r(null), 12000))]);
       setStage("scan");
@@ -165,6 +174,8 @@ export function LiveScanHost() {
       ctx.clearRect(0, 0, L.W, L.H);
       const fresh = v.currentTime !== lastT;
       lastT = v.currentTime;
+      // the tab was hidden or the phone stalled: drop the pulse samples so the gap isn't read as a heartbeat
+      if (now - lastFrame > 1000) pulse.reset();
       const dt = Math.min(0.1, (now - lastFrame) / 1000);
       lastFrame = now;
       const t = (now - t0) / 1000;
@@ -542,6 +553,22 @@ function Results({ data, onAgain, onClose }: { data: { report: ScanReport; photo
   const focus = report.metrics.filter((m) => m.key !== "heart" && m.key !== "stress").sort((a, b) => a.level - b.level)[0];
   const ask = `My NEA live face scan: ${report.metrics.map((m) => `${m.label} ${m.value}`).join(", ")}. Skin score ${report.score}/100. What should I do first?`;
   const hotWhere = report.metrics.find((m) => m.key === hot)?.where ?? [];
+  // save this scan to the Skin Diary (on this device only) and count it for Glow Club, once
+  const [saved, setSaved] = useState<{ ok: boolean; pts: number } | null>(null);
+  useEffect(() => {
+    if (SAVED.has(data)) return;
+    SAVED.add(data);
+    let live = true;
+    thumbnail(photo).then((thumb) => {
+      const heart = report.metrics.find((m) => m.key === "heart");
+      const entry = addDiaryEntry({ score: report.score, bpm: heart ? parseInt(heart.value, 10) || undefined : undefined, metrics: report.metrics.map((m) => ({ key: m.key, label: m.label, value: m.value, level: m.level })), photo: thumb });
+      const pts = entry ? award("scan") : 0;
+      if (live) setSaved({ ok: Boolean(entry), pts });
+    });
+    return () => {
+      live = false;
+    };
+  }, [data, photo, report]);
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 overflow-y-auto bg-porcelain text-ink" data-lenis-prevent>
@@ -613,6 +640,18 @@ function Results({ data, onAgain, onClose }: { data: { report: ScanReport; photo
 
             <WaterGoal extra={report.waterGlasses} />
 
+            {saved?.ok && (
+              <Link href="/skin-diary" onClick={onClose} className="mt-3 flex items-center gap-3 rounded-2xl border border-flora/20 bg-flora-soft p-3.5 transition hover:bg-flora/15">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white">
+                  <BookHeart className="h-5 w-5 text-flora" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[14.5px] font-medium">Saved to your Skin Diary{saved.pts ? ` · +${saved.pts} Glow points` : ""}</span>
+                  <span className="block text-[13px] text-graphite">Scan again next week to see your skin change. Stays on this phone.</span>
+                </span>
+              </Link>
+            )}
+
             <div className="mt-5 grid gap-2 sm:flex sm:flex-wrap">
               <button onClick={() => (onClose(), book.open("skin-scan", "Free skin scan"))} className="btn-primary justify-center">
                 <CalendarHeart className="h-4 w-4" /> Book my free in-clinic scan
@@ -634,6 +673,9 @@ function Results({ data, onAgain, onClose }: { data: { report: ScanReport; photo
     </motion.div>
   );
 }
+
+/** Scans already written to the diary (so a re-render never saves one twice). */
+const SAVED = new WeakSet<object>();
 
 /** A simple water goal for today: tap a glass each time you drink. Remembered on this phone for the day. */
 function WaterGoal({ extra }: { extra: number }) {

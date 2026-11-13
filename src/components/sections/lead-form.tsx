@@ -80,6 +80,15 @@ const PRESETS: Record<LeadKind, { fields: Field[]; submit: string; done: string 
   },
 };
 
+/** A friend's Glow Club code, if this visitor arrived from a shared link. */
+function friendCode() {
+  try {
+    return window.localStorage.getItem("nea-ref") || "";
+  } catch {
+    return "";
+  }
+}
+
 export function LeadForm({ kind, source, dark, className, after }: { kind: LeadKind; source?: string; dark?: boolean; className?: string; after?: React.ReactNode }) {
   const preset = PRESETS[kind];
   const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
@@ -91,7 +100,7 @@ export function LeadForm({ kind, source, dark, className, after }: { kind: LeadK
     setError("");
     const data = Object.fromEntries(new FormData(e.currentTarget).entries());
     try {
-      const res = await fetch("/api/lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind, source, ...data }) });
+      const res = await fetch("/api/lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind, source, ...data, ...(friendCode() ? { ref: friendCode() } : {}) }) });
       if (!res.ok) throw new Error((await res.json().catch(() => ({})))?.error || "Could not send");
       setState("done");
     } catch (err) {
