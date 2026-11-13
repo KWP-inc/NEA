@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { answer, search } from "@/lib/knowledge";
 import { brief, briefCompact, pagesFor } from "@/lib/si/brain";
+import { allow, tooMany } from "@/lib/rate-limit";
 import { ENGINE_LABEL, configured, defaultEngine, setupHint, stream, type Engine, type Turn } from "@/lib/si/engines";
 
 /**
@@ -22,8 +23,10 @@ export function GET() {
 }
 
 export async function POST(req: Request) {
+  if (!allow(req, "ask", 20)) return tooMany();
   const body = (await req.json().catch(() => ({}))) as { question?: string; context?: string; engine?: string; history?: Turn[] };
-  const { question, context } = body;
+  const question = typeof body.question === "string" ? body.question.trim() : "";
+  const context = typeof body.context === "string" ? body.context.slice(0, 600) : undefined;
   if (!question || question.length > 500) return NextResponse.json({ error: "Ask a question up to 500 characters" }, { status: 400 });
 
   const full = context ? `${context} ${question}` : question;

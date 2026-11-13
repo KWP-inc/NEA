@@ -11,6 +11,22 @@ const nextConfig = {
       { protocol: "https", hostname: "bioarolabs.com", pathname: "/pdp/**" },
     ],
   },
+  poweredByHeader: false,
+  async headers() {
+    // Standard security headers on every page. The camera stays allowed for this site only (live scan, mirror, Skin Lens, barcode scan).
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
+          { key: "Permissions-Policy", value: "camera=(self), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()" },
+        ],
+      },
+    ];
+  },
   async redirects() {
     // Keep every old WordPress URL working after the relaunch (SEO equity).
     return [

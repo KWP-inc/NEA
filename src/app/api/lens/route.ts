@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { SIGN_KEYS, type LensResult } from "@/content/lens";
+import { allow, tooMany } from "@/lib/rate-limit";
 
 /**
  * Nea SI Skin Lens: reads the VISIBLE skin signs in one face photo with Gemini's vision model.
@@ -42,6 +43,7 @@ export function GET() {
 }
 
 export async function POST(req: Request) {
+  if (!allow(req, "lens", 8)) return tooMany();
   const key = process.env.GEMINI_API_KEY;
   if (!key) return NextResponse.json({ error: "Skin Lens needs GEMINI_API_KEY on the server." }, { status: 503 });
   const body = (await req.json().catch(() => ({}))) as { image?: string };
