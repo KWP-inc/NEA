@@ -23,12 +23,11 @@ export const offers: Offer[] = [
   {
     slug: "skin-scan",
     name: "NEA Skin Health Report",
-    kicker: "Complimentary this month",
+    kicker: "Free skin scan",
     headline: "See what your skin has been trying to tell you.",
     summary:
       "Our AI skin imager photographs your face in 8 kinds of light and looks below the surface: hidden pigmentation, UV damage, pores, texture, redness and hydration. You leave with a clear report and two or three priorities, never a hard sell.",
     value: "A $150 assessment",
-    spots: "20 scans each week",
     steps: [
       { title: "Book your spot", detail: "Pick a time online. Tell us your age and your main concern so we prepare." },
       { title: "The scan", detail: "About 15 seconds, no contact. 8 kinds of light capture layers you cannot see in a mirror." },

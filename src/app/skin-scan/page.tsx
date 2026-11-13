@@ -10,7 +10,7 @@ import { JsonLd, faqSchema, pageMeta } from "@/lib/seo";
 
 export const metadata = pageMeta({
   title: "Free NEA Skin Health Report — advanced skin scan in Calgary",
-  description: "A free AI skin scan in Calgary: 8 kinds of light and a 36MP camera show hidden sun damage, pigment, pores, wrinkles, redness and hydration in 15 seconds, graded on 14+ measures. 20 spots each week.",
+  description: "A free AI skin scan in Calgary: 8 kinds of light and a 36MP camera show hidden sun damage, pigment, pores, wrinkles, redness and hydration in 15 seconds, graded on 14+ measures.",
   path: "/skin-scan",
 });
 
@@ -29,7 +29,7 @@ export default function SkinScanPage() {
   return (
     <>
       <JsonLd data={faqSchema(QA)} />
-      <PageHero trail={[{ name: "Free Skin Health Report", path: "/skin-scan" }]} title="The NEA Skin Health Report." lede={`${offer.value}, complimentary this month. ${offer.spots}.`} />
+      <PageHero trail={[{ name: "Free Skin Health Report", path: "/skin-scan" }]} title="The NEA Skin Health Report." lede={`${offer.value}, free for you. 15 seconds, and nothing touches your skin.`} />
       <section className="pb-24">
         <div className="container">
           <ScanOffer />
