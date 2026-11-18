@@ -1,4 +1,5 @@
 "use client";
+import { track } from "@/lib/analytics";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, CalendarHeart, Clock3, Search, UserRound, Video, X } from "lucide-react";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
@@ -16,7 +17,10 @@ export const useBooking = () => useContext(BookingCtx);
  */
 export function BookingProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<{ open: boolean; page?: string; title?: string }>({ open: false });
-  const open = useCallback((page?: string, title?: string) => setState({ open: true, page, title }), []);
+  const open = useCallback((page?: string, title?: string) => {
+    track("book_click", { service: page ?? "", title: title ?? "" });
+    setState({ open: true, page, title });
+  }, []);
   useEffect(() => {
     const on = (e: Event) => {
       const d = (e as CustomEvent<{ key?: string; title?: string }>).detail ?? {};

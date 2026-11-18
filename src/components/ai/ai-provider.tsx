@@ -1,4 +1,5 @@
 "use client";
+import { track } from "@/lib/analytics";
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { AiOverlay } from "./ai-overlay";
 import { ChatLauncher } from "./chat-launcher";
@@ -18,7 +19,10 @@ const isTyping = (el: EventTarget | null) => {
 export function AiProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<{ open: boolean; opts: OpenOptions; nonce: number }>({ open: false, opts: {}, nonce: 0 });
 
-  const open = useCallback((o: OpenOptions = {}) => setState((s) => ({ open: true, opts: o, nonce: s.nonce + 1 })), []);
+  const open = useCallback((o: OpenOptions = {}) => {
+    track("si_open", { context: (o.context ?? "").slice(0, 80) });
+    setState((s) => ({ open: true, opts: o, nonce: s.nonce + 1 }));
+  }, []);
   const close = useCallback(() => setState((s) => ({ ...s, open: false })), []);
 
   useEffect(() => {
