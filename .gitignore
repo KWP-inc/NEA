@@ -4,3 +4,9 @@ out
 .env*.local
 *.tsbuildinfo
 .DS_Store
+.env
+.env.production
+backups/
+*.dump
+test-results/
+tests/out/

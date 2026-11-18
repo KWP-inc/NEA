@@ -2,37 +2,61 @@
   "name": "nea-precision-skin",
   "version": "1.0.0",
   "private": true,
-  "description": "NEA Precision Skin \u2014 healthy skin starts inside. Next.js 15 + TypeScript frontend.",
+  "description": "NEA Precision Skin — healthy skin starts inside. Next.js 15 + TypeScript frontend.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "db:migrate": "node db/migrate.mjs",
+    "db:maintain": "node scripts/db-maintain.mjs",
+    "db:backup": "bash scripts/backup-db.sh",
+    "admin:create": "node scripts/create-admin.mjs",
+    "seo:indexnow": "node scripts/indexnow.mjs",
+    "check:images": "node scripts/check-images.mjs",
+    "test:e2e": "python3 tests/e2e.py",
+    "test:links": "python3 tests/links.py",
+    "test:security": "python3 tests/security.py",
+    "test:load": "node tests/load.mjs",
+    "media:migrate": "node scripts/migrate-wp-images.mjs"
   },
   "dependencies": {
+    "altcha-lib": "^1.4.1",
     "clsx": "^2.1.1",
     "dotted-map": "^2.2.3",
     "framer-motion": "^11.18.2",
     "gsap": "^3.12.7",
+    "jose": "^5.10.0",
     "lenis": "^1.1.20",
     "lucide-react": "0.468.0",
     "next": "^15.5.0",
+    "nodemailer": "^6.10.1",
+    "otplib": "^12.0.1",
+    "pg": "^8.23.1",
+    "qrcode": "^1.5.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "server-only": "^0.0.1",
     "tailwind-merge": "^2.6.0",
-    "three": "^0.172.0"
+    "three": "^0.172.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/node": "^22.10.7",
+    "@types/nodemailer": "^8.0.2",
+    "@types/pg": "^8.23.1",
+    "@types/qrcode": "^1.5.6",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
     "@types/three": "^0.172.0",
+    "autocannon": "^8.0.0",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.5.1",
     "tailwindcss": "^3.4.17",
+    "tsx": "^4.23.15",
     "typescript": "^5.7.3"
   },
   "engines": {
-    "node": ">=18.18.0"
+    "node": ">=20.9.0"
   }
 }
