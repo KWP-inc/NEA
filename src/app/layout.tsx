@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Instrument_Serif } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { Footer } from "@/components/layout/footer";
 import { Dock } from "@/components/layout/dock";
@@ -10,19 +10,36 @@ import { BrandCorner } from "@/components/layout/brand-corner";
 import { MirrorLazy } from "@/components/face/mirror-lazy";
 import { LiveScanLazy } from "@/components/scan/live-scan-lazy";
 import { RefCapture } from "@/components/glow/ref-capture";
+import { AccountProvider } from "@/components/account/account-provider";
+import { ConsentBanner } from "@/components/account/consent-banner";
 import { SmoothScroll } from "@/components/layout/smooth-scroll";
 import { JsonLd, clinicSchema } from "@/lib/seo";
 import { site } from "@/lib/site";
 import { themeInitScript } from "@/components/theme/init";
 
 // Editorial serif for headlines (Aesop / luxury feel), Inter for everything you read and tap.
-const display = Instrument_Serif({ subsets: ["latin"], variable: "--font-display", weight: "400", style: ["normal", "italic"], display: "swap" });
-const sans = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
+// Self-hosted (SIL Open Font License, see src/app/fonts): no call to Google at build time or in the browser.
+const display = localFont({
+  src: [
+    { path: "./fonts/instrument-serif-latin-400-normal.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/instrument-serif-latin-400-italic.woff2", weight: "400", style: "italic" },
+  ],
+  variable: "--font-display",
+  display: "swap",
+});
+const sans = localFont({
+  src: [
+    { path: "./fonts/inter-latin-wght-normal.woff2", weight: "100 900", style: "normal" },
+    { path: "./fonts/inter-latin-wght-italic.woff2", weight: "100 900", style: "italic" },
+  ],
+  variable: "--font-sans",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: { default: `${site.name} | Healthy skin starts inside · Calgary`, template: `%s | ${site.name}` },
-  description: site.description,
+  description: "Physician-managed skin and wellness clinic in NE Calgary. Fotona laser, injectables and medical-grade skincare, plus gut and skin microbiome testing. Free skin scan.",
   applicationName: site.name,
   keywords: [
     "skin clinic Calgary",
@@ -42,9 +59,14 @@ export const metadata: Metadata = {
     siteName: site.name,
     title: `${site.name} — Healthy skin starts inside`,
     description: site.description,
-    images: [{ url: "https://neaprecisionskin.com/wp-content/uploads/2023/11/Asset-18.png", width: 305, height: 381, alt: site.name }],
+    images: [{ url: "/og/nea-share.jpg", width: 1200, height: 630, alt: `${site.name}: Healthy skin starts inside` }],
   },
-  twitter: { card: "summary_large_image", title: site.name, description: site.description },
+  twitter: { card: "summary_large_image", title: site.name, description: site.description, images: ["/og/nea-share.jpg"] },
+  // Search Console and Bing Webmaster Tools: paste each tool's verification code into the server env
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION || undefined,
+    other: process.env.BING_SITE_VERIFICATION ? { "msvalidate.01": process.env.BING_SITE_VERIFICATION } : undefined,
+  },
   alternates: { canonical: "/" },
   robots: { index: true, follow: true },
   category: "health",
@@ -75,6 +97,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </div>
         <JsonLd data={clinicSchema()} />
         <SmoothScroll />
+        <AccountProvider>
         <BookingProvider>
           <AiProvider>
             <ReelsProvider>
@@ -85,9 +108,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <MirrorLazy />
               <LiveScanLazy />
               <RefCapture />
+              <ConsentBanner />
             </ReelsProvider>
           </AiProvider>
         </BookingProvider>
+        </AccountProvider>
       </body>
     </html>
   );

@@ -4,6 +4,7 @@
  * The camera picture never leaves the device: frames are read locally and only 468 points come out.
  * The library (about 9 MB including the model) loads on demand, the first time someone turns the camera on.
  */
+// If you change VERSION, change the two MediaPipe paths in the Content-Security-Policy in next.config.mjs too.
 const VERSION = "0.10.14";
 const LIB = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${VERSION}/vision_bundle.mjs`;
 const WASM = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${VERSION}/wasm`;
