@@ -17,7 +17,15 @@ npm run dev        # http://localhost:3000
 npm run build && npm start   # production
 ```
 
-Node 18.18+ (Node 20 or 22 recommended). Deploys as-is to Vercel, Netlify or any Node host.
+Node 20 LTS or newer. Needs PostgreSQL 16 for accounts. Runs on NEA's own server: see **DEPLOY.md**.
+
+## Accounts, database and staff page (update 26)
+
+- **Members:** sign in with an email code (or Google / Apple). Age 16+; 16–17 need a parent's yes. Scan numbers, plans and Glow Club points are saved to the account. Face photos are never stored.
+- **Database:** PostgreSQL 16 with Row Level Security (`db/migrations`). Run `npm run db:migrate`.
+- **Staff page:** at the secret `ADMIN_PATH`, with two-step sign-in. Create the first admin with `npm run admin:create -- you@example.com "Name"`.
+- **Security, analytics, SEO and tests:** see `docs/Architecture.md`, `docs/Testing.md` and `tests/README.md`.
+- **Deploying:** `DEPLOY.md` (Nginx, PM2, cron, backups, email, Search Console, Bing).
 
 ## Before launch (please confirm)
 
@@ -110,7 +118,7 @@ Settings (server only, in `.env.local` and your host's environment variables, ne
 | `GEMINI_HEDGE_MS` / `GEMINI_FIRST_TOKEN_MS` | Optional speed settings (defaults 1500 and 9000) |
 | `SI_DEFAULT_ENGINE` | `xevyo` or `gemini`: which one new visitors start with |
 
-`api/ask` allows up to 60 seconds per answer (`maxDuration`). On Vercel's Hobby plan that is the maximum; Gemini usually answers in 3–15 seconds, longer when Google is busy.
+`api/ask` can take up to about 60 seconds per answer (Nginx allows 70 s, see deploy/nginx.conf). Gemini usually answers in 3–15 seconds, longer when Google is busy.
 
 ## Smart Search
 
@@ -137,7 +145,7 @@ NEA's videos play on this site through each platform's official embedded player.
 4. Click Generate token next to the account and copy it. The app can stay in development mode because it only reads NEA's own account.
 5. Add `INSTAGRAM_ACCESS_TOKEN=<token>` to `.env.local` and to the hosting provider's environment variables, then redeploy.
 
-Tokens last 60 days. `vercel.json` calls `/api/instagram/refresh` every Monday to restart the 60 days (set `CRON_SECRET` in Vercel to protect it). On another host, call that URL weekly with any scheduler. If the refresh response ever shows `"tokenChanged": true`, paste the new token from Meta into `INSTAGRAM_ACCESS_TOKEN`.
+Tokens last 60 days. A weekly server cron calls `/api/instagram/refresh` with `CRON_SECRET` to restart the 60 days (see DEPLOY.md). Without `CRON_SECRET` the route is switched off. If the refresh response ever shows `"tokenChanged": true`, paste the new token from Meta into `INSTAGRAM_ACCESS_TOKEN`.
 
 ## 3D models and credits
 

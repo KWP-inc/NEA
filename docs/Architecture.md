@@ -1,6 +1,6 @@
 # Architecture
 
-Last updated: 18 Nov 2026
+Last updated: 18 Nov 2026 (built in update 26)
 
 ## 1. Big picture
 
@@ -28,17 +28,19 @@ src/
   app/                 pages (server-rendered) + api/ routes
     (public pages)     /, /treatments, /programs, …
     account/           sign-in, sign-up, settings (new)
-    staff-<random>/    admin pages, hidden path (new)
+    staff-portal/      admin pages, reached only through the secret ADMIN_PATH (middleware rewrite)
     api/               all server endpoints
   components/          UI, grouped by feature
   content/             ALL copy and data (edit text here)
   lib/
     server/            server-only code (new): db, auth, email, audit, rate-limit, captcha
     …                  shared helpers
-  db/
-    schema.ts          Drizzle schema (new)
-    migrations/        SQL migrations, incl. RLS policies (new)
-middleware.ts          security headers + CSP nonce + admin path guard (new)
+middleware.ts          admin path rewrite + 404 guard, noindex on private pages
+db/
+  migrations/          SQL migrations incl. RLS policies and nea_maintenance()
+  migrate.mjs          migration runner
+deploy/                nginx.conf, PM2 ecosystem
+tests/                 security.py, e2e.py, links.py, load.mjs
 docs/                  these docs
 ```
 
@@ -47,9 +49,10 @@ docs/                  these docs
 ## 3. Database (PostgreSQL)
 
 - **Access:**
-  - **Drizzle ORM** on `node-postgres`. Every query is parameterized.
-  - Raw SQL only through Drizzle's `sql` template, which still uses parameters.
-- **Migrations:** drizzle-kit, plus hand-written SQL for RLS policies, stored in `src/db/migrations`.
+  - `node-postgres` (`pg`) through `src/lib/server/db.ts`.
+  - Every query uses `$1, $2…` parameters. No ORM, no string-built SQL.
+  - `asUser()`, `asStaff()`, `asSystem()` and `asAnon()` wrap each request in a transaction that sets `app.user_id` and `app.role`.
+- **Migrations:** plain SQL files in `db/migrations/`, applied in order by `npm run db:migrate` (tracked in `schema_migrations`).
 - **IDs:** random UUIDs. Nothing guessable.
 
 ### Tables
@@ -70,7 +73,10 @@ docs/                  these docs
 | `leads` | id, kind, name, email, phone, message, created_at | Form submissions |
 | `staff_mfa` | user_id, totp_secret (encrypted), backup_codes_hash | Staff only |
 | `audit_log` | id, staff_id, action, target, before, after, ip, created_at | **Insert-only** |
-| `rate_limits` | key, count, reset_at | Only used if Redis isn't available |
+| `glow_docs` | user_id, kind (`routine`/`event`/`plan`), data | One document each, size-capped |
+| `redemptions` | user_id, reward, pts, code, used_at | Front desk marks them used |
+| `activity_daily` | day, name, events, visitors | Kept after raw events are dropped |
+| `rate_limits` | key, count, reset_at | UNLOGGED table shared by every app server (no Redis needed) |
 
 ### Indexes
 - `users(email)` unique
@@ -129,7 +135,7 @@ docs/                  these docs
 | Input | `zod` schema on every body, query and param. Unknown keys rejected. Strings trimmed and length-capped |
 | Owner check (IDOR) | Never take `user_id` from the client. Always from the session. Any object id is looked up **with** the session user (and RLS) |
 | CSRF | `SameSite=Lax` cookie + `Origin`/`Host` check on POST, PUT, PATCH, DELETE. Server actions check origin too |
-| Rate limit | Per IP + per user + per email (sign-in). Redis if DevOps adds it, otherwise the Postgres `rate_limits` table. The current in-memory limiter is fine for one server only |
+| Rate limit | Per IP (from `X-Real-IP`, set by Nginx) + per email for sign-in codes. Stored in the Postgres `rate_limits` table, so every server shares it. Falls back to memory if the database is down |
 | Captcha | **ALTCHA** (open-source, self-hosted proof-of-work, no third party) on sign-up, sign-in, lead forms and parent consent, plus a honeypot field |
 | CORS | Same-origin only. API routes send no `Access-Control-Allow-Origin` |
 | Output | JSON only. Never return stack traces. Errors are generic, details go to server logs |
@@ -137,11 +143,11 @@ docs/                  these docs
 | Uploads | Skin Lens photo: check JPEG, PNG or WebP by **magic bytes**, not just the label. Max 2 MB. Analysed in memory, never saved |
 | Webhooks | Outgoing lead webhook signed with `HMAC-SHA256` (`X-NEA-Signature`). Incoming webhooks (email provider, future) verified the same way, with a timestamp and 5-minute replay window |
 
-## 6. Security headers (middleware)
+## 6. Security headers (`next.config.mjs`)
 
 - **Content-Security-Policy:**
   - `default-src 'self'`
-  - `script-src 'self' 'nonce-…' 'strict-dynamic'`
+  - `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net`. Next.js needs its small inline scripts. A nonce would force every page to render per request and lose the page caching, so we chose caching and lock everything else down.
   - `img-src 'self' data: blob:` plus the allowed image hosts
   - `connect-src 'self'` plus the MediaPipe CDN
   - `frame-src` for Instagram, YouTube and TikTok embeds
@@ -153,8 +159,8 @@ docs/                  these docs
 
 ## 7. Admin page
 
-- Lives at a **random path** set in the env (`ADMIN_PATH`, for example `/staff-7f3k…`). It's not in the sitemap, it's blocked in robots, and it carries a `noindex` header.
-- Middleware returns **404** (not 403) unless there's a staff session with `mfa_ok`. Outsiders can't tell the page exists.
+- Lives at a **random path** set in the env (`ADMIN_PATH`, for example `/staff-7f3k…`). It's not in the sitemap and it carries a `noindex` header. The internal folder `/staff-portal` always answers 404 when opened directly.
+- The page layout returns **404** (not 403) unless there's a staff session. Staff without two-step sign-in see only the MFA screen, and every staff API answers 404 without `mfa_ok`. The session token is replaced after two-step sign-in.
 - Every staff write goes through one `audit()` helper.
 
 ## 8. Caching and performance

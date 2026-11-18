@@ -1,6 +1,6 @@
 # PRD: NEA Precision Skin website + member accounts
 
-Last updated: 18 Nov 2026 · Owner: Arsh (final say on everything)
+Last updated: 18 Nov 2026 (built in update 26) · Owner: Arsh (final say on everything)
 
 ## 1. Why we are building this
 
@@ -19,7 +19,7 @@ Goals:
 | --- | --- |
 | Visitor (no account) | Try the scan, ask Nea SI, see prices, book |
 | Member (free account) | Save scans, track their skin, earn Glow Club points, plan treatments |
-| Minor (under 18) | Same as a member, **only after a parent says yes** |
+| Teen (16–17) | Same as a member, **only after a parent says yes**. Under 16 can't make an account |
 | NEA staff | See members, leads, scans, points and activity. Give points |
 | Admin (Arsh / owner) | Everything staff can do, plus manage staff and settings |
 
@@ -42,8 +42,8 @@ Goals:
 - **Email + 6-digit code** (no password). The code is sent by NEA's own email service.
 - **Google** and **Apple** sign-in.
 - **Age check at sign-up:**
-  - Ask for birth month and year.
-  - **Under 18:** enter a parent's email. The parent gets a consent link. The account only saves data after the parent says yes.
+  - Ask for birth month and year. **Minimum age 16.**
+  - **16–17:** enter a parent's email. The parent gets a consent link. The account only saves data after the parent says yes.
   - Unconfirmed child accounts are deleted after 7 days.
 - **Consent at sign-up:** a tick box for the privacy policy. A separate, optional tick box for marketing emails.
 - **Delete my account:** a button in account settings that deletes all of the user's data.

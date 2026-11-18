@@ -32,16 +32,16 @@ Last updated: 18 Nov 2026
 - [ ] No JWT secret, API key or token in logs, errors or responses.
 
 ### Every API route and server action
-- [ ] First line: `requireUser()`, `requireStaff()` or `requireAdmin()`. Public routes are listed in `src/lib/server/public-routes.ts` with a reason.
+- [ ] Wrap the handler in `api({ auth: "public" | "session" | "user" | "staff" | "admin", limit: [name, max] }, …)` from `src/lib/server/route.ts`. It does the CSRF, rate-limit and permission checks.
 - [ ] **Never trust the frontend.** Validate every input with a `zod` schema (types, lengths, enums). Reject unknown keys.
 - [ ] **Stop IDOR:** never accept `userId` from the client. Look objects up together with the session user. RLS is the backup.
-- [ ] Rate limit applied (`limit(req, name, max)`).
+- [ ] Rate limit set in `api({ limit: [...] })`.
 - [ ] Captcha (ALTCHA) on public forms: sign-up, sign-in, leads, parent consent.
 - [ ] Mutating methods check `Origin` (CSRF).
 - [ ] Return generic errors. Log details on the server only.
 
 ### Database
-- [ ] **Parameterized queries only** (Drizzle or the `sql` template). Never build SQL with string joins.
+- [ ] **Parameterized queries only** (`q("… $1 …", [value])`). Never build SQL with string joins.
 - [ ] New user-data tables: **enable RLS + add policies in the same migration.**
 - [ ] Add an index for every new `where` or `order by` column used in a list.
 - [ ] Money, points and consent are **insert-only ledgers**, never updated in place.
@@ -86,7 +86,8 @@ Last updated: 18 Nov 2026
 ## F. Before every zip
 1. `npm run typecheck`
 2. `npm run build`
-3. Phone + desktop screenshots of changed screens
-4. `node scripts/check-images.mjs`
-5. Security checklist (section C) for changed routes
-6. Zip changed files + write commits
+3. With the server running: `npm run test:security`, `npm run test:links`, `npm run test:e2e` (see tests/README.md)
+4. Phone + desktop screenshots of changed screens
+5. `node scripts/check-images.mjs`
+6. Security checklist (section C) for changed routes
+7. Zip changed files + write commits
