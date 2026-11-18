@@ -4,6 +4,7 @@ import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { useState } from "react";
 import { NeaLogo } from "@/components/brand/nea-logo";
 import { SmartSearch } from "@/components/search/smart-search";
+import { AccountButton } from "@/components/account/account-button";
 
 /**
  * Not a navbar: the brand top-left, and Smart Search top-right (an icon that opens into a search bar).
@@ -33,7 +34,10 @@ export function BrandCorner() {
         >
           <NeaLogo className={`w-auto transition-all duration-500 ${compact ? "h-8" : "h-11"}`} />
         </Link>
-        <SmartSearch />
+        <div className="flex items-center gap-2">
+          <SmartSearch />
+          <AccountButton />
+        </div>
       </div>
     </motion.div>
   );
