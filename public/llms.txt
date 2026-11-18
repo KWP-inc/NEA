@@ -3,9 +3,9 @@
 > Physician-managed skin and wellness clinic in NE Calgary, Alberta. "Healthy skin starts inside." NEA combines Fotona laser, medical-grade skincare (ZO Skin Health, AlumierMD, Vivier, Glo, Luzern) and injectables with gut, skin and vaginal microbiome testing (BioAro Labs) and Registered Dietitian nutrition led by founder Raman Kapoor, RD.
 
 - Address: #104, 3151 27 Street NE, Calgary, Alberta
-- Phone: 1-403-230-8812 · Text: 403-973-0722 · Email: nea@neaskincare.com
+- Phone: 587-892-5722 · Text: 403-973-0722 · Email: nea@neaskincare.com
 - Hours: Monday–Saturday 9:00 a.m.–5:00 p.m.; Sunday closed
-- Booking: https://neamedicalaesthetic.janeapp.com/
+- Booking: https://neaprecisionskin.com/book
 - Free 15-minute consultations and a complimentary Skin Health Report (advanced facial scan)
 
 ## Programs
@@ -24,3 +24,14 @@
 - [Fotona laser](/fotona)
 - [FAQ](/faq)
 - [Contact](/contact)
+
+## Free tools (My Glow)
+- [Live face scan](/skin-lens#live): 20-second phone scan that estimates heart rate, stress, skin hydration look, redness, shine, tone and smoothness. Wellness estimates only, not a medical test. Runs on the phone; the camera picture is never sent.
+- [Skin Diary](/skin-diary): saves scan numbers over time (free account; photos never saved by NEA).
+- [Routine Builder](/routine): barcode scan of skincare products, right order and clashes.
+- [Event Countdown](/countdown): week-by-week skin plan before a wedding or event.
+- [Injectables Planner](/injectables): typical amounts, recovery and top-up dates by face area.
+- [Glow Club](/glow-club): points for scans, plans and visits, traded for rewards at the clinic.
+
+## Full detail
+- [llms-full.txt](/llms-full.txt): every program, treatment and FAQ in plain text.

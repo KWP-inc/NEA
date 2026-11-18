@@ -3,7 +3,7 @@ import { Blocks } from "@/components/sections/blocks";
 import { termsBlocks } from "@/content/legal";
 import { pageMeta } from "@/lib/seo";
 
-export const metadata = pageMeta({ title: "Terms of Service", description: "Terms for using the NEA Precision Skin website.", path: "/terms" });
+export const metadata = pageMeta({ title: "Terms of Service", description: "The terms for using the NEA Precision Skin website, its free online tools, member accounts and Glow Club rewards.", path: "/terms" });
 
 export default function TermsPage() {
   return (

@@ -3,9 +3,15 @@ import { site } from "./site";
 import { founder } from "@/content/team";
 import { reviews } from "@/content/reviews";
 
-/** Structured data for search engines and AI answer engines (SEO / AEO / GEO). */
+export const DEFAULT_OG = "/og/nea-share.jpg";
+
+/**
+ * Structured data for search engines and AI answer engines (SEO / AEO / GEO).
+ * `<`, `>` and `&` are escaped so text inside the data can never close the script tag (XSS).
+ */
 export function JsonLd({ data }: { data: Record<string, unknown> | Record<string, unknown>[] }) {
-  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />;
+  const safe = JSON.stringify(data).replace(/</g, "\\u003c").replace(/>/g, "\\u003e").replace(/&/g, "\\u0026");
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safe }} />;
 }
 
 export function clinicSchema() {
@@ -18,7 +24,7 @@ export function clinicSchema() {
     description: site.description,
     slogan: site.tagline,
     url: site.url,
-    telephone: "+1-403-230-8812",
+    telephone: "+1-587-892-5722",
     email: site.email,
     image: "https://neaprecisionskin.com/wp-content/uploads/2023/11/Asset-18.png",
     priceRange: "$$",
@@ -96,11 +102,26 @@ export function articleSchema(a: { title: string; description: string; path: str
   };
 }
 
-export function pageMeta({ title, description, path, image }: { title: string; description: string; path: string; image?: string }): Metadata {
+/** Google shows about 155 characters of a description: end on a full sentence (or word) inside that. */
+export function fitDescription(s: string, max = 158) {
+  const t = s.replace(/\s+/g, " ").trim();
+  if (t.length <= max) return t;
+  const cut = t.slice(0, max);
+  const sentence = cut.lastIndexOf(". ");
+  if (sentence > 80) return cut.slice(0, sentence + 1);
+  return `${cut.slice(0, cut.lastIndexOf(" ")).replace(/[,;:.\-–]+$/, "")}…`;
+}
+
+/** Long page titles drop the " | NEA Precision Skin" suffix so Google doesn't cut them off (about 65 characters). */
+const fitTitle = (title: string) => (`${title} | ${site.name}`.length > 65 ? { absolute: title.length > 70 ? `${title.slice(0, title.lastIndexOf(" ", 67))}…` : title } : title);
+
+export function pageMeta({ title, description: rawDescription, path, image }: { title: string; description: string; path: string; image?: string }): Metadata {
+  const description = fitDescription(rawDescription);
   return {
-    title,
+    title: fitTitle(title),
     description,
     alternates: { canonical: path },
-    openGraph: { title, description, url: path, images: image ? [{ url: image }] : undefined },
+    openGraph: { title, description, url: path, type: "website", siteName: site.name, locale: "en_CA", images: [{ url: image ?? DEFAULT_OG, width: image ? undefined : 1200, height: image ? undefined : 630, alt: title }] },
+    twitter: { card: "summary_large_image", title, description, images: [image ?? DEFAULT_OG] },
   };
 }
