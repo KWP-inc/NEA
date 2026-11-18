@@ -1,0 +1,16 @@
+# Local development database (and a reference for DevOps). Not used in production as-is.
+#   docker compose up -d   →   then: npm run db:migrate
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: nea_owner
+      POSTGRES_PASSWORD: owner_dev_only
+      POSTGRES_DB: nea
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - nea-db:/var/lib/postgresql/data
+volumes:
+  nea-db:
