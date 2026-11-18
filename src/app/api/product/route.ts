@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { allow, tooMany } from "@/lib/rate-limit";
+import { guard } from "@/lib/rate-limit";
 
 /**
  * Skincare product lookup for the Routine Builder, by barcode (?code=) or by name (?q=).
@@ -19,7 +19,8 @@ const clean = (p: Raw) => {
 };
 
 export async function GET(req: Request) {
-  if (!allow(req, "product", 30)) return tooMany();
+  const g = await guard(req, "product", 30);
+  if (g) return g;
   const url = new URL(req.url);
   const code = (url.searchParams.get("code") || "").replace(/\D/g, "");
   const q = (url.searchParams.get("q") || "").trim().slice(0, 80);

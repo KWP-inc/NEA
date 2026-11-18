@@ -2,6 +2,9 @@
 import { useState, type FormEvent } from "react";
 import { Check, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { site } from "@/lib/site";
+import { solveCaptcha } from "@/lib/captcha-client";
+import { track } from "@/lib/analytics";
 
 export type LeadKind = "skin-scan" | "consultation" | "contact" | "partner" | "magazine" | "experience";
 
@@ -100,8 +103,10 @@ export function LeadForm({ kind, source, dark, className, after }: { kind: LeadK
     setError("");
     const data = Object.fromEntries(new FormData(e.currentTarget).entries());
     try {
-      const res = await fetch("/api/lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind, source, ...data, ...(friendCode() ? { ref: friendCode() } : {}) }) });
+      const captcha = await solveCaptcha();
+      const res = await fetch("/api/lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind, source, ...data, captcha, ...(friendCode() ? { ref: friendCode() } : {}) }) });
       if (!res.ok) throw new Error((await res.json().catch(() => ({})))?.error || "Could not send");
+      track("lead_submit", { kind });
       setState("done");
     } catch (err) {
       setState("error");
@@ -158,7 +163,7 @@ export function LeadForm({ kind, source, dark, className, after }: { kind: LeadK
       </div>
       {state === "error" && (
         <p role="alert" className="col-span-2 text-sm text-red-600">
-          {error}. Please call {"1-403-230-8812"} instead.
+          {error}. Please call {site.phone} instead.
         </p>
       )}
     </form>

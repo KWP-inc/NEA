@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { SIGN_KEYS, type LensResult } from "@/content/lens";
-import { allow, tooMany } from "@/lib/rate-limit";
+import { guard } from "@/lib/rate-limit";
+import { readCapped } from "@/lib/server/http";
 
 /**
  * Nea SI Skin Lens: reads the VISIBLE skin signs in one face photo with Gemini's vision model.
  * - The photo is sent to Google once, for this answer only. NEA does not save it anywhere.
  * - It never diagnoses; it describes what is visible and points to NEA's free in-clinic scan for real measurements.
  */
-export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
 const PROMPT = `You are Nea SI's Skin Lens on the website of a physician-managed skin clinic.
@@ -38,18 +38,36 @@ const SCHEMA = {
   required: ["quality", "summary", "signs"],
 };
 
+/** Magic bytes: JPEG FF D8 FF, PNG 89 50 4E 47, WebP "RIFF"…"WEBP". */
+function imageMatches(mime: string, head: Buffer) {
+  if (mime === "image/jpeg") return head[0] === 0xff && head[1] === 0xd8 && head[2] === 0xff;
+  if (mime === "image/png") return head.subarray(0, 4).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47]));
+  if (mime === "image/webp") return head.subarray(0, 4).toString("latin1") === "RIFF" && head.subarray(8, 12).toString("latin1") === "WEBP";
+  return false;
+}
+
 export function GET() {
   return NextResponse.json({ ready: Boolean(process.env.GEMINI_API_KEY) });
 }
 
 export async function POST(req: Request) {
-  if (!allow(req, "lens", 8)) return tooMany();
-  const key = process.env.GEMINI_API_KEY;
-  if (!key) return NextResponse.json({ error: "Skin Lens needs GEMINI_API_KEY on the server." }, { status: 503 });
-  const body = (await req.json().catch(() => ({}))) as { image?: string };
+  const g = await guard(req, "lens", 8);
+  if (g) return g;
+  const raw = await readCapped(req, 3_000_000);
+  if (raw === null) return NextResponse.json({ error: "That photo is too large. Try again." }, { status: 413 });
+  let body: { image?: string } = {};
+  try {
+    body = JSON.parse(raw) as { image?: string };
+  } catch {
+    /* handled below */
+  }
   const m = body.image?.match(/^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/);
   if (!m) return NextResponse.json({ error: "Send one photo as a JPEG, PNG or WebP." }, { status: 400 });
   if (m[2].length > 2_800_000) return NextResponse.json({ error: "That photo is too large. Try again." }, { status: 413 });
+  // Check the real file type from its first bytes, not just the label the browser sent.
+  if (!imageMatches(m[1], Buffer.from(m[2].slice(0, 32), "base64"))) return NextResponse.json({ error: "Send one photo as a JPEG, PNG or WebP." }, { status: 400 });
+  const key = process.env.GEMINI_API_KEY;
+  if (!key) return NextResponse.json({ error: "Skin Lens needs GEMINI_API_KEY on the server." }, { status: 503 });
 
   const models = (process.env.GEMINI_LENS_MODELS || process.env.GEMINI_MODELS || "gemini-3.5-flash-lite,gemini-flash-lite-latest,gemini-flash-latest").split(",").map((s) => s.trim()).filter(Boolean);
   const deadline = Date.now() + 55000;

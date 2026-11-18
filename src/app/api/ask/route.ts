@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { answer, search } from "@/lib/knowledge";
 import { brief, briefCompact, pagesFor } from "@/lib/si/brain";
-import { allow, tooMany } from "@/lib/rate-limit";
+import { guard } from "@/lib/rate-limit";
+import { readCapped } from "@/lib/server/http";
 import { ENGINE_LABEL, configured, defaultEngine, setupHint, stream, type Engine, type Turn } from "@/lib/si/engines";
 
 /**
@@ -13,7 +14,6 @@ import { ENGINE_LABEL, configured, defaultEngine, setupHint, stream, type Engine
  * Response: newline-delimited JSON events
  *   {"t":"meta", sources, plan, steps}  → {"t":"d","v":"text…"} (many) → {"t":"done", model, fellBack}
  */
-export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
 /** Which engines are connected, for the switch in the chat. */
@@ -23,8 +23,16 @@ export function GET() {
 }
 
 export async function POST(req: Request) {
-  if (!allow(req, "ask", 20)) return tooMany();
-  const body = (await req.json().catch(() => ({}))) as { question?: string; context?: string; engine?: string; history?: Turn[] };
+  const g = await guard(req, "ask", 20);
+  if (g) return g;
+  const raw = await readCapped(req, 64 * 1024);
+  if (raw === null) return NextResponse.json({ error: "That message is too long." }, { status: 413 });
+  let body: { question?: string; context?: string; engine?: string; history?: Turn[] } = {};
+  try {
+    body = JSON.parse(raw || "{}");
+  } catch {
+    /* handled below */
+  }
   const question = typeof body.question === "string" ? body.question.trim() : "";
   const context = typeof body.context === "string" ? body.context.slice(0, 600) : undefined;
   if (!question || question.length > 500) return NextResponse.json({ error: "Ask a question up to 500 characters" }, { status: 400 });
