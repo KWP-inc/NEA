@@ -6,14 +6,14 @@ import { ArrowRight, CalendarHeart, Check, Copy, Crown, Gift, Loader2, Lock, Shi
 import { useBooking } from "@/components/booking/booking";
 import { openLiveScan } from "@/components/scan/open-live-scan";
 import { EARN, REWARDS, TIERS, nextTier, tierFor, type EarnKey } from "@/content/club";
-import { EMPTY_CLUB, KEYS, award, balance, earned, getClub, lifetime, redeem, useStored, type Club, type ClubRedeem } from "@/lib/glow-store";
+import { EMPTY_CLUB, KEYS, award, awardCode, balance, earned, getClub, lifetime, redeemReward, useStored, type Club, type ClubRedeem } from "@/lib/glow-store";
 import { shortDate } from "@/lib/ics";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 /**
  * Glow Club: points for scans, plans, visits and friends, traded for rewards at the front desk.
- * Points are kept on this phone (no account, nothing sent to NEA); the clinic confirms every reward.
+ * Points live in the member's account (the server decides every point); the clinic confirms every reward.
  */
 export function GlowClub() {
   const [club, , ready] = useStored<Club>(KEYS.club, EMPTY_CLUB);
@@ -62,14 +62,9 @@ export function GlowClub() {
     setBusy(true);
     setCodeMsg(null);
     try {
-      const res = await fetch("/api/club", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ code }) });
-      const d = (await res.json().catch(() => ({}))) as { ok?: boolean; pts?: number; label?: string; code?: string; error?: string };
-      if (!res.ok || !d.ok || !d.pts) setCodeMsg({ ok: false, text: d.error ?? "That code didn't work." });
-      else {
-        const got = award("code", { pts: d.pts, label: d.label, code: d.code });
-        setCodeMsg(got ? { ok: true, text: `+${got} points added. Thank you for visiting.` } : { ok: false, text: "You already used this code today." });
-        if (got) setCode("");
-      }
+      const r = await awardCode(code.trim());
+      setCodeMsg(r.pts ? { ok: true, text: `+${r.pts} points added. Thank you for visiting.` } : { ok: false, text: r.error ?? "That code didn't work." });
+      if (r.pts) setCode("");
     } catch {
       setCodeMsg({ ok: false, text: "We couldn't check the code. Try again." });
     } finally {
@@ -77,8 +72,8 @@ export function GlowClub() {
     }
   };
 
-  const doRedeem = (r: (typeof REWARDS)[number]) => {
-    const t = redeem(r);
+  const doRedeem = async (r: (typeof REWARDS)[number]) => {
+    const t = await redeemReward(r);
     setConfirm(null);
     if (t) setTicket(t);
   };
@@ -279,7 +274,7 @@ export function GlowClub() {
 
       <p className="flex gap-2 text-[12.5px] leading-snug text-graphite">
         <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-        Points are saved on this phone, with no account. If you clear your browser or change phones, they start again. The front desk confirms every reward. One reward per visit. Points have no cash value.
+        Points are saved in your free NEA account, so they follow you to any phone. The front desk confirms every reward. One reward per visit. Points have no cash value.
       </p>
 
       {/* the reward ticket */}

@@ -19,7 +19,7 @@ export function GlowTools() {
           <h2 id="my-glow-title" className="text-display-md font-semibold">
             Your skin, <em className="aurora-text">every day.</em>
           </h2>
-          <p className="measure mt-5 text-lede text-graphite">Free tools that work between visits. Everything stays on your phone.</p>
+          <p className="measure mt-5 text-lede text-graphite">Free tools that work between visits. Create a free account to save your progress.</p>
         </div>
         <SkinWeather className="mb-4" />
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">

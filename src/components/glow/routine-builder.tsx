@@ -19,7 +19,7 @@ const fromFound = (f: Found): Product => ({ id: uid(), name: f.name, brand: f.br
 /**
  * Routine Builder. Add the products you own (scan the barcode, search by name, or pick a type) and see
  * the right order for morning and night, what clashes, what to be careful with and what is missing.
- * The list is saved on this phone only.
+ * The list is saved to the member's account (signed in) and kept on the phone as a working copy.
  */
 export function RoutineBuilder() {
   const [products, setProducts, ready] = useStored<Product[]>(KEYS.routine, []);
@@ -167,7 +167,7 @@ export function RoutineBuilder() {
             </ul>
           )}
           <p className="mt-3 flex gap-2 text-[12.5px] leading-snug text-graphite">
-            <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0" /> Saved on this phone only.
+            <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0" /> Saved to your free NEA account.
           </p>
         </section>
       </div>

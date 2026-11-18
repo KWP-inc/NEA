@@ -1,3 +1,4 @@
+import { GuestSaveNotice } from "@/components/account/guest-save-notice";
 import { PageHero } from "@/components/sections/page-hero";
 import { EventCountdown } from "@/components/glow/event-countdown";
 import { pageMeta } from "@/lib/seo";
@@ -14,6 +15,7 @@ export default function Page() {
       <PageHero trail={[{ name: "Event Countdown", path: "/countdown" }]} title="Glow on the day that matters." lede="Tell us the date. Get a week-by-week skin plan that fits the time you have." className="!pb-8 md:!pb-12" />
       <section className="pb-28">
         <div className="container">
+          <GuestSaveNotice what="plan" />
           <EventCountdown />
         </div>
       </section>

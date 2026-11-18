@@ -26,7 +26,7 @@ const inDays = (n: number) => {
 
 /**
  * Event Countdown. Pick the day and what you want, and get a week-by-week skin plan that is safe for the time left:
- * what to do now, what to book when, and what to skip because it is too close. Saved on this phone.
+ * what to do now, what to book when, and what to skip because it is too close. Saved to the member's account.
  */
 export function EventCountdown() {
   const [saved, setSaved, ready] = useStored<Saved>(KEYS.event, { type: "wedding", date: "", goals: ["glow"] });

@@ -24,7 +24,7 @@ const valueOf = (e: DiaryEntry, key: string) => (key === "score" ? e.score : e.m
 const daysBetween = (a: Date, b: Date) => Math.round((new Date(b.getFullYear(), b.getMonth(), b.getDate()).getTime() - new Date(a.getFullYear(), a.getMonth(), a.getDate()).getTime()) / 86400000);
 
 /**
- * Skin Diary: every live face scan, saved on this phone only. Shows how the skin score and each reading
+ * Skin Diary: every live face scan, saved to the member's account (numbers only; photos stay on the phone). Shows how the skin score and each reading
  * change over time, a before-and-after of the first and latest photo, and the full history.
  */
 export function SkinDiary() {
@@ -49,9 +49,9 @@ export function SkinDiary() {
           <BookHeart className="h-7 w-7 text-flora" />
         </span>
         <h2 className="mt-4 font-display text-[clamp(1.8rem,5vw,2.6rem)] leading-tight text-ink">Your diary starts with one scan.</h2>
-        <p className="mx-auto mt-2 max-w-md text-[16px] leading-relaxed text-graphite">Scan your face for 20 seconds. We save your skin score here, on your phone. Scan again next week and watch it change.</p>
+        <p className="mx-auto mt-2 max-w-md text-[16px] leading-relaxed text-graphite">Scan your face for 20 seconds. We save your skin score to your account. Scan again next week and watch it change.</p>
         <ol className="mx-auto mt-6 grid max-w-2xl gap-2 text-left sm:grid-cols-3">
-          {["Scan your face with your camera.", "Your score and photo are saved here.", "Come back each week to see your trend."].map((t, i) => (
+          {["Scan your face with your camera.", "Your score is saved to your account. The photo stays on this phone.", "Come back each week to see your trend."].map((t, i) => (
             <li key={t} className="flex gap-3 rounded-2xl border border-ink/[0.06] bg-white/70 p-3.5 text-[14.5px] text-ink">
               <span className="tabular grid h-6 w-6 shrink-0 place-items-center rounded-full bg-flora-soft text-[12px] text-flora">{i + 1}</span>
               {t}
@@ -203,7 +203,7 @@ export function SkinDiary() {
       </div>
       <p className="flex gap-2 text-[12.5px] leading-snug text-graphite">
         <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-        Your diary is saved on this phone only. NEA cannot see it. A phone camera gives a guide, not a medical test, and light changes the numbers, so scan in the same spot each time.
+        Your scores are saved to your free account. Photos stay on this phone only and are never sent to NEA. A phone camera gives a guide, not a medical test, and light changes the numbers, so scan in the same spot each time.
       </p>
     </div>
   );
@@ -324,7 +324,7 @@ function Compare({ a, b }: { a: DiaryEntry; b: DiaryEntry }) {
               <p className="tabular font-display text-[2rem] leading-none text-ink">{b.score}</p>
             </div>
           </div>
-          <p className="mt-3 text-[12.5px] text-graphite">Photos are small copies kept on this phone. Different light can change how they look.</p>
+          <p className="mt-3 text-[12.5px] text-graphite">Photos are small copies kept on this phone only. They are never sent to NEA. Different light can change how they look.</p>
         </div>
       </div>
     </section>
