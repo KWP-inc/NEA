@@ -6,8 +6,8 @@ export const site = {
   description:
     "NEA Precision Skin is a physician-managed skin and wellness clinic in NE Calgary. We combine Fotona laser, medical-grade skincare and injectables with gut, skin and vaginal microbiome testing and Registered Dietitian nutrition, so results start at the root cause.",
   url: process.env.NEXT_PUBLIC_SITE_URL || "https://neaprecisionskin.com",
-  phone: "1-403-230-8812",
-  phoneHref: "tel:+14032308812",
+  phone: "587-892-5722",
+  phoneHref: "tel:+15878925722",
   text: "403-973-0722",
   textHref: "sms:+14039730722",
   email: "nea@neaskincare.com",
