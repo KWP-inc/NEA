@@ -8,7 +8,9 @@ import { useBooking } from "@/components/booking/booking";
 import { useAi } from "@/components/ai/ai-provider";
 import { cameraSupported, loadLandmarker, type Pt } from "@/lib/face-tracker";
 import { BlinkCounter, PatchAverage, PulseMeter, buildReport, readPatch, type MetricKey, type RegionKey, type ScanReport } from "@/lib/skin-signals";
-import { addDiaryEntry, award, thumbnail } from "@/lib/glow-store";
+import { accountMode, addDiaryEntry, award, thumbnail } from "@/lib/glow-store";
+import { JoinCard } from "@/components/account/join-card";
+import { track } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
 type Stage = "intro" | "loading" | "scan" | "result";
@@ -93,6 +95,7 @@ export function LiveScanHost() {
 
   const begin = async () => {
     setError("");
+    if (typeof window !== "undefined" && !window.isSecureContext) return setError("The camera only works on a secure link. Open this page with https:// and try again.");
     if (!cameraSupported()) return setError("This browser can’t use the camera. Try Safari or Chrome on your phone.");
     setStage("loading");
     setLive(EMPTY);
@@ -117,6 +120,7 @@ export function LiveScanHost() {
       // face tracking makes the readings follow your face; if it can't load, an oval guide does the same job
       const lm = await Promise.race([loadLandmarker().catch(() => null), new Promise<null>((r) => setTimeout(() => r(null), 12000))]);
       setStage("scan");
+      track("scan_start");
       stopFns.current.push(run(lm));
     } catch (e) {
       stopAll();
@@ -284,6 +288,7 @@ export function LiveScanHost() {
         stopAll();
         setResult({ report, ...s });
         setStage("result");
+        track("scan_finish");
       }
     };
 
@@ -415,7 +420,7 @@ export function LiveScanHost() {
           <canvas ref={canvas} className={cn("absolute inset-0 h-full w-full", stage === "scan" ? "block" : "invisible")} />
 
           {/* top bar */}
-          <div className={cn("absolute inset-x-0 top-0 z-10 flex items-center justify-between p-4 sm:p-6", stage === "result" && "border-b border-ink/[0.06] bg-porcelain/90 !py-3 text-ink backdrop-blur-md")}>
+          <div className={cn("absolute inset-x-0 top-0 z-10 flex items-center justify-between p-4 sm:p-6", stage === "result" && "border-b border-ink/[0.06] bg-porcelain/90 !py-3 text-ink backdrop-blur-md", (stage === "intro" || stage === "loading") && "bg-[#120d10]/90 backdrop-blur-md")}>
             <p className={cn("flex items-center gap-2 rounded-full px-3 py-1.5 text-[12.5px] backdrop-blur-md", stage === "result" ? "bg-ink/[0.05]" : "bg-black/40")}>
               <NeaSiIcon className="h-4 w-4" /> NEA live skin scan
             </p>
@@ -463,7 +468,7 @@ function Intro({ loading, error, onStart }: { loading: boolean; error: string; o
   return (
     <div className="absolute inset-0 overflow-y-auto" data-lenis-prevent>
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_45%_at_50%_30%,rgb(var(--c-warm)/0.35),transparent_70%)]" />
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="relative mx-auto flex min-h-full max-w-md flex-col justify-center px-5 pb-8 pt-20">
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="relative mx-auto flex min-h-full max-w-md flex-col justify-start px-5 pb-8 pt-24 sm:justify-center">
         <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-white/60">Free · 20 seconds · on your phone</p>
         <h2 className="mt-2 font-display text-[clamp(2.1rem,8vw,2.8rem)] leading-[1.02]">Scan your face. See what your skin says.</h2>
         <p className="mt-3 text-[15.5px] leading-relaxed text-white/75">Turn on your camera and hold still. Nea SI reads your pulse and your skin, and shows the results right on your face.</p>
@@ -614,7 +619,10 @@ function Results({ data, onAgain, onClose }: { data: { report: ScanReport; photo
             )}
             {report.confidence === "low" && <p className="mt-3 rounded-xl bg-amber-100 px-3 py-2 text-[13px] text-amber-900">The light or movement made the pulse hard to read. For a sharper result, scan again facing a window and hold very still.</p>}
 
-            <ul className="mt-5 grid gap-2.5 sm:grid-cols-2">
+            <p className="mt-5 flex items-center gap-1.5 text-[12.5px] text-graphite">
+              <Sparkles className="h-3.5 w-3.5 shrink-0 text-flora" /> Estimated by Nea SI from tiny colour changes in your face.
+            </p>
+            <ul className="mt-2 grid gap-2.5 sm:grid-cols-2">
               {report.metrics.map((m, i) => {
                 const I = ICON[m.key];
                 const good = m.level >= 70;
@@ -625,7 +633,9 @@ function Results({ data, onAgain, onClose }: { data: { report: ScanReport; photo
                         <span className="flex items-center gap-2 text-[13px] text-graphite">
                           <I className="h-4 w-4 text-flora" /> {m.label}
                         </span>
-                        <span className={cn("rounded-full px-2 py-0.5 text-[11.5px] font-medium", good ? "bg-sky-soft text-sky" : m.level >= 45 ? "bg-amber-100 text-amber-800" : "bg-flora-soft text-flora")}>{m.word}</span>
+                        {m.word.toLowerCase() !== m.value.toLowerCase() && (
+                          <span className={cn("rounded-full px-2 py-0.5 text-[11.5px] font-medium", good ? "bg-sky-soft text-sky" : m.level >= 45 ? "bg-amber-100 text-amber-800" : "bg-flora-soft text-flora")}>{m.word}</span>
+                        )}
                       </span>
                       <span className="mt-1 block font-display text-[1.45rem] leading-tight">{m.value}</span>
                       <span className="mt-2 block h-1.5 overflow-hidden rounded-full bg-ink/[0.06]">
@@ -640,6 +650,10 @@ function Results({ data, onAgain, onClose }: { data: { report: ScanReport; photo
 
             <WaterGoal extra={report.waterGlasses} />
 
+            {saved && !saved.ok && accountMode() !== "member" && (
+              <JoinCard compact className="mt-3" title="Save this scan to your Skin Diary." text="Create a free account and we'll save this scan's numbers, so you can watch your skin change. Your photo is never saved." />
+            )}
+
             {saved?.ok && (
               <Link href="/skin-diary" onClick={onClose} className="mt-3 flex items-center gap-3 rounded-2xl border border-flora/20 bg-flora-soft p-3.5 transition hover:bg-flora/15">
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white">
@@ -647,7 +661,7 @@ function Results({ data, onAgain, onClose }: { data: { report: ScanReport; photo
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block text-[14.5px] font-medium">Saved to your Skin Diary{saved.pts ? ` · +${saved.pts} Glow points` : ""}</span>
-                  <span className="block text-[13px] text-graphite">Scan again next week to see your skin change. Stays on this phone.</span>
+                  <span className="block text-[13px] text-graphite">Scan again next week to see your skin change. Numbers only; your photo stays on this phone.</span>
                 </span>
               </Link>
             )}
@@ -665,7 +679,7 @@ function Results({ data, onAgain, onClose }: { data: { report: ScanReport; photo
             </div>
             <p className="mt-4 flex gap-2 text-[12.5px] leading-snug text-graphite">
               <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-flora" />
-              A phone camera gives a quick guide, not a medical test. The free in-clinic scan sees 8 kinds of light, hidden sun damage and your skin age.
+              These are Nea SI estimates. They may differ from a smartwatch or medical device. This is a wellness guide, not a medical test. The free in-clinic scan sees 8 kinds of light, hidden sun damage and your skin age.
             </p>
           </div>
         </div>
