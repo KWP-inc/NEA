@@ -56,6 +56,21 @@ export const hasGoogle = () => Boolean(env.google.id && env.google.secret);
 export const hasApple = () => Boolean(env.apple.id && env.apple.team && env.apple.keyId && env.apple.key);
 export const hasDb = () => Boolean(process.env.DATABASE_URL);
 
-/** Member accounts need a database and a way to email sign-in codes (in development the code is printed instead). */
-export const accountsReady = () =>
-  hasDb() && Boolean(process.env.AUTH_PEPPER && process.env.SESSION_SECRET && process.env.ALTCHA_HMAC_KEY) && (Boolean(process.env.SMTP_HOST) || !env.isProd);
+/**
+ * Without an email server, sign-in codes are printed in the server terminal instead of emailed.
+ * Always on in `npm run dev`. For `npm start` on your own computer set EMAIL_TO_CONSOLE=1.
+ * Never set EMAIL_TO_CONSOLE on the real server.
+ */
+export const emailToConsole = () => !env.isProd || process.env.EMAIL_TO_CONSOLE === "1";
+
+/** Settings still missing before member accounts can work (empty = ready). */
+export function accountsMissing() {
+  const missing: string[] = [];
+  if (!hasDb()) missing.push("DATABASE_URL");
+  for (const k of ["AUTH_PEPPER", "SESSION_SECRET", "ALTCHA_HMAC_KEY"]) if (!process.env[k]) missing.push(k);
+  if (!process.env.SMTP_HOST && !emailToConsole()) missing.push("SMTP_HOST (or EMAIL_TO_CONSOLE=1 for testing on your own computer)");
+  return missing;
+}
+
+/** Member accounts need a database, the secrets, and a way to send sign-in codes. */
+export const accountsReady = () => accountsMissing().length === 0;
