@@ -7,9 +7,9 @@ import { connectAccount, forgetDevice, setAccountMode } from "@/lib/glow-store";
  * so JavaScript can't read it; only the server can say who you are).
  */
 export type Me = { name: string; email: string; role: "member" | "staff" | "admin"; status: "active" | "pending_parent" | "disabled"; marketing: boolean; clubCode: string; mfaOk: boolean };
-type Ctx = { me: Me | null; ready: boolean; accounts: boolean; providers: { google: boolean; apple: boolean }; refresh: () => Promise<void>; signOut: () => Promise<void> };
+type Ctx = { me: Me | null; ready: boolean; accounts: boolean; missing: string[]; providers: { google: boolean; apple: boolean }; refresh: () => Promise<void>; signOut: () => Promise<void> };
 
-const AccountCtx = createContext<Ctx>({ me: null, ready: false, accounts: true, providers: { google: false, apple: false }, refresh: async () => {}, signOut: async () => {} });
+const AccountCtx = createContext<Ctx>({ me: null, ready: false, accounts: true, missing: [], providers: { google: false, apple: false }, refresh: async () => {}, signOut: async () => {} });
 export const useAccount = () => useContext(AccountCtx);
 
 export function AccountProvider({ children }: { children: ReactNode }) {
@@ -17,13 +17,15 @@ export function AccountProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
   const [providers, setProviders] = useState({ google: false, apple: false });
   const [accounts, setAccounts] = useState(true);
+  const [missing, setMissing] = useState<string[]>([]);
 
   const refresh = useCallback(async () => {
     try {
       const res = await fetch("/api/auth/me", { cache: "no-store", credentials: "same-origin" });
-      const d = (await res.json()) as { user: Me | null; providers: { google: boolean; apple: boolean }; accounts?: boolean };
+      const d = (await res.json()) as { user: Me | null; providers: { google: boolean; apple: boolean }; accounts?: boolean; missing?: string[] };
       setMe(d.user);
       setAccounts(d.accounts !== false);
+      setMissing(d.missing ?? []);
       setProviders(d.providers ?? { google: false, apple: false });
       if (d.user?.status === "active") await connectAccount(d.user.clubCode);
       else if (d.user) setAccountMode("guest");
@@ -50,5 +52,5 @@ export function AccountProvider({ children }: { children: ReactNode }) {
     void refresh();
   }, [refresh]);
 
-  return <AccountCtx.Provider value={{ me, ready, accounts, providers, refresh, signOut }}>{children}</AccountCtx.Provider>;
+  return <AccountCtx.Provider value={{ me, ready, accounts, missing, providers, refresh, signOut }}>{children}</AccountCtx.Provider>;
 }
