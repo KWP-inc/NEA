@@ -192,7 +192,7 @@ export function InjectablesPlanner() {
               {slowest > 0 && (
                 <p className="mt-3 rounded-2xl bg-flora-soft p-3.5 text-[13.5px] leading-snug text-ink">
                   Have a big day coming? Do this plan at least <strong className="font-semibold">{slowest} weeks</strong> before it.{" "}
-                  <Link href="/countdown" className="inline-flex items-center gap-1 font-medium text-flora underline-offset-4 hover:underline">
+                  <Link href="/countdown" className="inline-flex items-center gap-1 font-medium text-flora underline underline-offset-4">
                     Make an event countdown <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 </p>

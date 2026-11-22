@@ -188,7 +188,7 @@ export function SkinDiary() {
         {confirmAll ? (
           <span className="flex items-center gap-2 rounded-full border border-flora/30 bg-white px-4 py-2 text-[14px]">
             Delete every scan?
-            <button onClick={() => (setEntries([]), setConfirmAll(false))} className="font-semibold text-flora underline-offset-4 hover:underline">
+            <button onClick={() => (setEntries([]), setConfirmAll(false))} className="font-semibold text-flora underline underline-offset-4">
               Yes, delete
             </button>
             <button onClick={() => setConfirmAll(false)} className="text-graphite underline-offset-4 hover:underline">

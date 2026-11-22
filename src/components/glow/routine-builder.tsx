@@ -419,7 +419,7 @@ function NameSearch({ onPick, onNone }: { onPick: (f: Found) => void; onNone: ()
       {hits && hits.length === 0 && (
         <p className="mt-3 text-[14px] text-graphite">
           No match.{" "}
-          <button onClick={onNone} className="font-medium text-flora underline-offset-4 hover:underline">
+          <button onClick={onNone} className="font-medium text-flora underline underline-offset-4">
             Pick its type instead
           </button>
           .
