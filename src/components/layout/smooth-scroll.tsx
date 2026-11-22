@@ -2,17 +2,21 @@
 import Lenis from "lenis";
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { isTouchDevice } from "@/lib/use-touch";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-/** Lenis inertial scrolling, kept in sync with GSAP ScrollTrigger. */
+/**
+ * Lenis inertial scrolling on computers (mouse and trackpad), kept in sync with GSAP ScrollTrigger.
+ * Phones and tablets keep their own native scrolling: Lenis on touch caused jumps and "stuck" pictures.
+ */
 export function SmoothScroll() {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || isTouchDevice()) return;
     const lenis = new Lenis({ duration: 1.15, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smoothWheel: true });
     (window as unknown as { __lenis?: Lenis }).__lenis = lenis;
     lenis.on("scroll", ScrollTrigger.update);
