@@ -18,6 +18,8 @@
     "test:links": "python3 tests/links.py",
     "test:security": "python3 tests/security.py",
     "test:load": "node tests/load.mjs",
+    "test:selenium": "python3 tests/selenium_test.py",
+    "test:perf": "node tests/perf.mjs",
     "media:migrate": "node scripts/migrate-wp-images.mjs"
   },
   "dependencies": {
