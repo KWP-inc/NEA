@@ -17,6 +17,8 @@ const scenarios = [
   { name: "Home page", path: "/", connections: 200, target: 800 },
   { name: "Treatment page", path: "/treatments/active-acne", connections: 200, target: 800 },
   { name: "Free scan page (poster QR)", path: "/free-scan", connections: 200, target: 800 },
+  { name: "Newsletters page", path: "/newsletters", connections: 200, target: 800 },
+  { name: "Instagram feed list", path: "/api/reels", connections: 100, target: 300 },
   { name: "Health check (app + database)", path: "/api/health", connections: 100, target: 300 },
   { name: "Who am I (signed out)", path: "/api/auth/me", connections: 100, target: 300 },
   { name: "Captcha puzzle", path: "/api/auth/captcha", connections: 50, target: 300 },
@@ -41,7 +43,7 @@ for (const s of scenarios) {
 }
 await mkdir("tests/out", { recursive: true });
 await writeFile(
-  "tests/out/load-report.md",
+  process.env.REPORT || "tests/out/load-report.md",
   `# Load test\n\n${new Date().toISOString().slice(0, 16)} · ${SECONDS}s per scenario · ${BASE}\n\n| Scenario | Users at once | Requests/s | Requests | Median | p97.5 | Failed | Target | Result |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n` +
     rows.map((r) => `| ${r.name} | ${r.connections} | ${r.rps} | ${r.total} | ${r.p50} ms | ${r.p95} ms | ${r.errors} | < ${r.target} ms | ${r.ok ? "✅" : "⚠️"} |`).join("\n") +
     "\n",
