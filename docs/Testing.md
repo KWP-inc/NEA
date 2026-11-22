@@ -1,19 +1,19 @@
-# Testing and review results (update 26)
+# Testing and review results (update 27)
 
-Run on the final build, 18 Nov 2026, against a production build (`npm run build && npm start`), PostgreSQL 16 and a local email catcher. How to re-run: `tests/README.md`. Full reports: `tests/out/` (made when you run them).
+Run on the final build, 21 Nov 2026, against a production build (`npm run build && npm start`), PostgreSQL 16 and a local email catcher. How to re-run: `tests/README.md`. Full reports: `tests/out/` (made when you run them).
 
 ## Summary
 
 | Test | Result |
 | --- | --- |
-| API and security (`npm run test:security`) | **88 / 88 passed** |
-| Browser, phone 390×844 + desktop 1280×800 (`npm run test:e2e`) | **121 / 121 passed** |
-| Links and SEO, 103 pages + 134 files (`npm run test:links`) | **0 broken links, 0 SEO issues** (see note) |
-| Load, behind Nginx (`npm run test:load`) | Pages: **0 failures at 200 users at once** |
+| API and security (`npm run test:security`) | **89 / 89 passed** |
+| Browser with Playwright, phone 390×844 + desktop 1280×800 (`npm run test:e2e`) | **143 / 143 passed** |
+| Browser with Selenium, phone + desktop (`npm run test:selenium`) | **59 / 59 passed** |
+| Links and SEO, 104 pages + 136 files (`npm run test:links`) | **0 broken links, 0 SEO issues** (see note) |
+| Speed, Lighthouse (`npm run test:perf`) | Computer **82–99**, phone **50–75** (see below) |
+| Load, behind Nginx (`npm run test:load`) | Pages and APIs: **0 failures at 200 users at once** |
 | Database security rules (RLS) | Members isolated; ledgers and audit log can't be changed |
-| Backup + restore | Backup made and restored into a new database: all 20 tables and data back |
 | Secrets in browser code | **None found** |
-| Independent security review (separate Claude agent) | No critical issues; all 6 medium and the low findings **fixed and re-tested** |
 
 **Note on links:** 49 photos still load from the old WordPress site, which the test machine couldn't reach. They are not broken today, but they **will** break when WordPress goes away: run `npm run media:migrate` before the domain switch (DEPLOY.md §3).
 
@@ -34,6 +34,15 @@ Run on the final build, 18 Nov 2026, against a production build (`npm run build 
 - **Your data:** download works with no photos; delete needs the word DELETE, removes everything, and anonymises activity.
 - **Hidden routes:** maintenance and Instagram routes are hidden without the secret; no CORS for other sites.
 
+## What the update 27 tests prove (phone complaints)
+- **No stuck photos:** on a phone, nothing with a photo stays pinned while the page scrolls (the Skin Twin photo used to).
+- **Native phone scrolling:** the smooth-scroll library is off on touch screens (it fought the finger and the pinned parts).
+- **Gallery** on phones is a simple swipe row (the 3D sphere pinned the screen).
+- **Glow Feed** on phones is a vertical swipe feed like Instagram Reels; swiping up shows the next video.
+- **Accounts:** separate **Sign in** and **Create account** tabs; a returning member signs in with the email code and goes straight to their account (no sign-up form).
+- **Content:** The Perfect Peel text on Facials; the full Large Pores plan; Rosacea is "a skin condition"; the new phone number everywhere and the old one nowhere.
+- **Staff page** opens for an admin after two-step (a Next.js change had broken it: fixed), and `/staff-portal` stays 404 even with a guessed internal header.
+
 ## What the browser tests prove
 - 24 key pages load on phone and desktop with **no JavaScript errors and no CSP blocks**; every tab on them clicks.
 - **Cookie banner:** nothing is sent before "Allow"; analytics start after it.
@@ -42,21 +51,44 @@ Run on the final build, 18 Nov 2026, against a production build (`npm run build 
 - **Full sign-up** through the real screens (email code → details → account), then member pages, then sign-out removes access.
 - **Staff page:** two-step setup with QR → backup codes → Overview, Members, Leads, Rewards, Staff, Audit log, with no errors.
 
+## Speed (Lighthouse, the engine behind PageSpeed Insights)
+
+Phone = Lighthouse's standard test: slow 4G and a 4× slower processor. Desktop = fast network.
+
+| Page | Phone before | Phone now | Desktop now |
+| --- | --- | --- | --- |
+| Home | 42 | **50–53** | 82 |
+| Treatments | 64 | 61–64 | 94 |
+| Facials | 65 | **75** | 98 |
+| Skin Lens | 67 | 70 | 96 |
+| Blog | 69 | 70 | 97 |
+| Newsletters | – | 73 | 97 |
+
+What changed on phones (the "glitchy" feel):
+- **Background blur:** 106 blurred layers on the home page → **none** on cards (a near-solid colour instead). Blur made the phone redraw the page on every scroll frame.
+- **Download:** home page **3.7 MB → 0.9 MB** (the hero video loads only when you reach it, and phones get a 0.5 MB copy instead of 2.9 MB).
+- **Processor busy while idle:** **54% → 30%**. Six endless animations now pause when off screen or when the tab is hidden; the Skin Twin photo is redrawn only when a slider moves; the hero drop runs at 30 fps on phones.
+- **Accessibility (home, phone):** 84 → **93** (contrast, labels, list structure).
+- Lighthouse's own measured first paint is **0.6 s**; its phone score adds a simulated slow-4G download of ~35 script files. Check the real site with https://pagespeed.web.dev after launch.
+- **Sign-in page SEO 54 is on purpose:** account pages are hidden from Google (`noindex`).
+
 ## Load test
 
-**Behind Nginx** (2 app processes, 2-CPU test machine, final build):
+**Behind Nginx with page caching** (as in production; 2-CPU test machine, final build), 15 s per test:
 
-| Scenario | Users at once | Pages/s | Median | p97.5 | Failed |
+| Scenario | Users at once | Requests/s | Median | p97.5 | Failed |
 | --- | --- | --- | --- | --- | --- |
-| Home page | 200 | 1,155 | 179 ms | 331 ms | 0 |
-| Treatment page | 200 | 4,230 | 44 ms | 72 ms | 0 |
-| Free-scan page (poster QR) | 200 | 4,433 | 43 ms | 71 ms | 0 |
-| Health check (app + database) | 100 | 681 | 122 ms | 353 ms | 0 |
-| Who am I (signed out) | 100 | 977 | 83 ms | 233 ms | 0 |
+| Home page | 200 | 927 | 215 ms | 461 ms | 0 |
+| Treatment page | 200 | 3,015 | 66 ms | 92 ms | 0 |
+| Free-scan page (poster QR) | 200 | 3,628 | 54 ms | 78 ms | 0 |
+| Newsletters page | 200 | 3,959 | 49 ms | 76 ms | 0 |
+| Instagram feed list | 100 | 662 | 122 ms | 185 ms | 0 |
+| Health check (app + database) | 100 | 625 | 142 ms | 282 ms | 0 |
+| Who am I (signed out) | 100 | 647 | 137 ms | 201 ms | 0 |
 
-- **Captcha:** Nginx set every request's IP to the real one, so the per-IP limit answered 429. This is correct, and it proves the IP can't be faked.
-- **Without Nginx** (one Node process): about 300–540 pages/s; at 200 users at once about 1% of requests waited over 10 s; at 100 users at once there were no failures.
-- **So:** always run behind Nginx with page caching and one Node process per core (DEPLOY.md).
+- **Captcha:** every test request came from one IP, so the per-IP limit answered 429. Correct: the IP can't be faked.
+- **Without Nginx** (one Node process): APIs pass; pages manage 260–560/s and about 1% of requests are still waiting when the test stops. So always run behind Nginx (DEPLOY.md).
+- **Found and fixed:** an old cached page (old phone number) was served after a rebuild because the Nginx cache wasn't cleared. `deploy/release.sh` now clears it and **fails the release** if the live page isn't the new build.
 
 ## Independent security review: findings and fixes
 
