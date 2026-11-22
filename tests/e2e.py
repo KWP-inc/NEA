@@ -24,7 +24,7 @@ os.makedirs(OUT, exist_ok=True)
 results = []
 
 PAGES = ["/", "/free-scan", "/skin-lens", "/skin-scan", "/treatments", "/treatments/active-acne", "/programs", "/programs/clear-skin", "/packages", "/tests", "/membership",
-         "/skin-diary", "/routine", "/countdown", "/injectables", "/glow-club", "/why-nea", "/body", "/magazine", "/faq", "/contact", "/privacy", "/account/sign-in", "/blog"]
+         "/skin-diary", "/routine", "/countdown", "/injectables", "/glow-club", "/why-nea", "/body", "/magazine", "/faq", "/contact", "/privacy", "/account/sign-in", "/blog", "/newsletters", "/gallery", "/treatments/facials", "/treatments/large-pores"]
 IGNORE = re.compile(r"_next/image|skin-weather|status of 503|Failed to load resource: the server responded with a status of 500|net::ERR_|openbeautyfacts|open-meteo|instagram|youtube|tiktok|jsdelivr|googleapis|nominatim|unsplash|neaprecisionskin\.com|bioarolabs|WebGL|GPU stall|THREE\.", re.I)
 
 
@@ -60,11 +60,13 @@ def watch(page, bucket):
     page.on("response", lambda r: bucket.append(f"HTTP {r.status} {r.url}") if r.status >= 400 and BASE in r.url and not IGNORE.search(r.url) and "/api/auth/me" not in r.url else None)
 
 
-def sign_in_ui(page, addr, birth=(1990, 5), name="Pat", tag="phone"):
-    page.goto(f"{BASE}/account/sign-in?next=/account")
+def sign_in_ui(page, addr, birth=(1990, 5), name="Pat", tag="phone", mode="join"):
+    page.goto(f"{BASE}/account/sign-in?next=/account&mode={mode}")
+    page.wait_for_selector("[role=tab]:has-text('Sign in')", timeout=20000)
+    page.click("[role=tab]:has-text('Create account')" if mode == "join" else "[role=tab]:has-text('Sign in')")
     page.fill("input[type=email]", addr)
     t0 = time.time() - 1
-    page.click("button:has-text('Send my code')")
+    page.click("form button[type=submit]")
     page.wait_for_selector("text=Check your email", timeout=30000)
     code = mail_code(addr, t0)
     page.screenshot(path=f"{OUT}/{tag}-signin-code.png")
@@ -169,9 +171,59 @@ def run_device(p, label, ctx_opts):
         page.goto(BASE + "/skin-diary")
         page.wait_for_selector("text=needs a free account", timeout=15000)
         check(f"[{label}] sign out clears access", True)
+        # a returning member signs in with the "Sign in" tab: straight to their account, no sign-up form
+        sign_in_ui(page, addr, tag=f"{label}-return", mode="signin")
+        check(f"[{label}] returning member signs in without creating a new account", "/welcome" not in page.url and page.locator("text=Signed in as").count() > 0, page.url)
+        page.goto(BASE + "/account")
+        page.click("button:has-text('Sign out')")
+        page.wait_for_url(BASE + "/", timeout=15000)
     except Exception as e:  # noqa: BLE001
         page.screenshot(path=f"{OUT}/{label}-signup-problem.png")
         check(f"[{label}] sign-up by email code works end to end", False, str(e)[:300])
+
+    # phone layout: nothing pinned on the screen while the page scrolls ("stuck photo")
+    if label == "phone":
+        page.goto(BASE + "/")
+        page.wait_for_timeout(1500)
+        stuck = page.evaluate("""() => {
+            const bad = [];
+            for (const el of document.querySelectorAll('main *')) {
+                const cs = getComputedStyle(el);
+                if (cs.position !== 'sticky' || !el.offsetParent) continue;
+                if (el.querySelector('img,canvas,video')) bad.push((el.className || el.tagName).toString().slice(0, 80));
+            }
+            return bad;
+        }""")
+        # the Skin Dive scene is pinned on purpose (full screen, covers the page) and has no blur on phones
+        stuck = [b for b in stuck if "bg-[#140e10]" not in b]
+        check("[phone] no small photo stays pinned while the page scrolls", not stuck, " | ".join(stuck[:3]))
+        smooth = page.evaluate("() => Boolean(window.__lenis)")
+        check("[phone] native phone scrolling (no smooth-scroll library on touch)", not smooth)
+        page.goto(BASE + "/gallery")
+        page.wait_for_timeout(1500)
+        swipe = page.locator("[aria-label='Photos from inside the clinic']").count()
+        page.screenshot(path=f"{OUT}/phone-gallery-swipe.png")
+        check("[phone] clinic gallery is a simple swipe row on phones", swipe > 0)
+        page.goto(BASE + "/")
+        page.wait_for_timeout(1200)
+        # Glow Feed: vertical swipe feed like Instagram Reels
+        page.locator("button:has-text('Watch all videos')").first.scroll_into_view_if_needed()
+        page.click("button:has-text('Watch all videos')")
+        page.wait_for_selector("[role=dialog][aria-label='Glow Feed']", timeout=10000)
+        page.wait_for_timeout(2500)
+        page.screenshot(path=f"{OUT}/phone-glow-feed-1.png")
+        feed = page.locator("[role=dialog] .snap-y")
+        n = page.locator("[role=dialog] section[data-i]").count()
+        feed.evaluate("el => el.scrollBy(0, el.clientHeight)")
+        page.wait_for_timeout(1500)
+        page.screenshot(path=f"{OUT}/phone-glow-feed-2.png")
+        counter = page.inner_text("[role=dialog] .tabular")
+        check("[phone] Glow Feed is a vertical swipe feed (swipe up = next video)", n > 1 and counter.startswith("2 /"), f"{n} items, counter {counter}")
+        page.click("[role=dialog] button[aria-label=Close]")
+        # header logo pill is solid (text never shows through)
+        page.mouse.wheel(0, 1500)
+        page.wait_for_timeout(800)
+        page.screenshot(path=f"{OUT}/phone-header-scrolled.png")
 
     # under 16 is stopped in the form itself
     page.goto(BASE + "/account/sign-in")
