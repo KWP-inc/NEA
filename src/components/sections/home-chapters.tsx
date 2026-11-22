@@ -92,7 +92,7 @@ export function TestsChapter() {
             <EvervaultCard key={t.slug} className="min-h-[300px]">
               <div className="flex h-full min-h-[300px] flex-col justify-between p-7">
                 <div>
-                  <p className="text-[13px] text-graphite/80">BioAro Labs</p>
+                  <p className="text-[13px] text-graphite">BioAro Labs</p>
                   <h3 className="mt-1 font-display text-3xl font-semibold">{t.name}</h3>
                 </div>
                 <div>
@@ -195,7 +195,7 @@ export function GalleryChapter() {
   return (
     <ScrollSphereGallery cards={galleryCards} className="bg-porcelain">
       <h2 className="text-display-md font-semibold">Inside the clinic.</h2>
-      <p className="mt-3 text-graphite">Keep scrolling to turn the sphere.</p>
+      <p className="mt-3 text-graphite">Scroll or swipe to see more.</p>
     </ScrollSphereGallery>
   );
 }
@@ -240,7 +240,7 @@ export function FounderChapter() {
                 <dd className="font-display text-4xl font-semibold">
                   <NumberTicker value={f.value} suffix={f.suffix} />
                 </dd>
-                <p className="mt-1 text-[14px] text-graphite">{f.label}</p>
+                <dd className="mt-1 text-[14px] text-graphite">{f.label}</dd>
               </div>
             ))}
           </dl>
@@ -279,7 +279,7 @@ export function MapChapter() {
             { name: "Manila", lat: 14.6, lng: 120.98, note: "Sample submission" },
           ]}
         />
-        <p className="mt-4 text-[13px] text-graphite/80">Routes are illustrative of BioAro’s secure global sample submission.</p>
+        <p className="mt-4 text-[13px] text-graphite">Routes are illustrative of BioAro’s secure global sample submission.</p>
       </div>
     </section>
   );
