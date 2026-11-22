@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Loader2, Mail, ShieldCheck } from "lucide-react";
+import { KeyRound, Loader2, Mail, ShieldCheck, UserPlus } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { solveCaptcha } from "@/lib/captcha-client";
 import { track } from "@/lib/analytics";
 import { useAccount } from "./account-provider";
@@ -27,7 +28,8 @@ export function SignInFlow() {
   const params = useSearchParams();
   const next = typeof window === "undefined" ? "/account" : safeNext(params.get("next"));
   const router = useRouter();
-  const { refresh, providers } = useAccount();
+  const { refresh, providers, accounts, ready } = useAccount();
+  const [mode, setMode] = useState<"signin" | "join">(params.get("mode") === "join" ? "join" : "signin");
   const [step, setStep] = useState<"email" | "code">("email");
   const [email, setEmail] = useState("");
   const [digits, setDigits] = useState(["", "", "", "", "", ""]);
@@ -73,7 +75,8 @@ export function SignInFlow() {
       const res = await fetch("/api/auth/verify", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email, code }) });
       const d = (await res.json().catch(() => ({}))) as { status?: string; error?: string };
       if (!res.ok) throw new Error(d.error || "That code didn't work.");
-      if (d.status === "needs-profile") return router.push(`/account/welcome?next=${encodeURIComponent(next)}`);
+      // a new email (or "Sign in" with an email that has no account yet) goes on to the short sign-up form
+      if (d.status === "needs-profile") return router.push(`/account/welcome?next=${encodeURIComponent(next)}${mode === "signin" ? "&new=1" : ""}`);
       track("signin", { method: "email" });
       await refresh();
       router.push(next);
@@ -106,10 +109,39 @@ export function SignInFlow() {
 
   return (
     <div className="mx-auto w-full max-w-md rounded-[32px] border border-ink/10 bg-white/75 p-6 shadow-sm backdrop-blur md:p-8">
-      {step === "email" ? (
+      {ready && !accounts ? (
         <>
-          <h1 className="font-display text-[2.2rem] leading-tight">Sign in or join free.</h1>
-          <p className="mt-2 text-[15px] text-graphite">Enter your email. We'll send you a 6-digit code. No password to remember.</p>
+          <h1 className="font-display text-[2.2rem] leading-tight">Accounts open soon.</h1>
+          <p className="mt-2 text-[15px] text-graphite">
+            Member accounts aren't switched on for this site yet. You can still use every free tool: the live face scan, Skin Lens, Nea SI and booking.
+          </p>
+        </>
+      ) : step === "email" ? (
+        <>
+          <div role="tablist" aria-label="Sign in or create an account" className="mb-6 grid grid-cols-2 gap-1 rounded-full bg-ink/[0.06] p-1">
+            {(
+              [
+                ["signin", "Sign in", KeyRound],
+                ["join", "Create account", UserPlus],
+              ] as const
+            ).map(([m, label, Icon]) => (
+              <button
+                key={m}
+                role="tab"
+                aria-selected={mode === m}
+                onClick={() => (setMode(m), setMsg(""))}
+                className={cn("flex items-center justify-center gap-1.5 rounded-full px-3 py-2.5 text-[14px] font-medium transition", mode === m ? "bg-white text-ink shadow-sm" : "text-graphite hover:text-ink")}
+              >
+                <Icon className="h-4 w-4" /> {label}
+              </button>
+            ))}
+          </div>
+          <h1 className="font-display text-[2.2rem] leading-tight">{mode === "signin" ? "Welcome back." : "Create your free account."}</h1>
+          <p className="mt-2 text-[15px] text-graphite">
+            {mode === "signin"
+              ? "Enter the email you joined with. We'll email you a 6-digit code to sign in. No password to remember."
+              : "Start with your email. We'll send a 6-digit code to check it's yours, then ask three quick questions."}
+          </p>
           <form onSubmit={sendCode} className="mt-6 space-y-3">
             <label className="block">
               <span className="text-[13px] text-graphite">Email</span>
@@ -125,7 +157,7 @@ export function SignInFlow() {
               />
             </label>
             <button type="submit" disabled={busy || !email} className="btn-primary w-full justify-center disabled:opacity-60">
-              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />} Send my code
+              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />} {mode === "signin" ? "Email me a sign-in code" : "Email me a code to start"}
             </button>
           </form>
           {(providers.google || providers.apple) && (
@@ -147,6 +179,23 @@ export function SignInFlow() {
               </div>
             </>
           )}
+          <p className="mt-5 text-[13.5px] text-graphite">
+            {mode === "signin" ? (
+              <>
+                New here?{" "}
+                <button onClick={() => setMode("join")} className="font-medium text-flora underline-offset-2 hover:underline">
+                  Create a free account
+                </button>
+              </>
+            ) : (
+              <>
+                Already a member?{" "}
+                <button onClick={() => setMode("signin")} className="font-medium text-flora underline-offset-2 hover:underline">
+                  Sign in
+                </button>
+              </>
+            )}
+          </p>
         </>
       ) : (
         <>
