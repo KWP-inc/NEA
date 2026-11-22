@@ -61,8 +61,8 @@ export const socialVideos: SocialVideo[] = [
 
 /** Which platform a link is from, its id and the official embed address. Returns null for links we can't embed. */
 export function embedFor(url: string): { platform: Platform; id: string; src: string } | null {
-  let m = url.match(/instagram\.com\/(?:[\w.]+\/)?(?:reel|reels|p|tv)\/([\w-]+)/i);
-  if (m) return { platform: "instagram", id: m[1], src: `https://www.instagram.com/reel/${m[1]}/embed/` };
+  let m = url.match(/instagram\.com\/(?:[\w.]+\/)?(reel|reels|p|tv)\/([\w-]+)/i);
+  if (m) return { platform: "instagram", id: m[2], src: `https://www.instagram.com/${m[1].toLowerCase() === "p" ? "p" : "reel"}/${m[2]}/embed/` };
   m = url.match(/(?:youtube\.com\/(?:shorts\/|watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/i);
   if (m) return { platform: "youtube", id: m[1], src: `https://www.youtube-nocookie.com/embed/${m[1]}?playsinline=1&rel=0&modestbranding=1` };
   m = url.match(/tiktok\.com\/@[\w.]+\/video\/(\d+)/i);
