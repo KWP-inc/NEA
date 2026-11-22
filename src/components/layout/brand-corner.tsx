@@ -30,7 +30,7 @@ export function BrandCorner() {
         <Link
           href="/"
           aria-label="NEA Precision Skin home"
-          className={`pointer-events-auto rounded-2xl text-ink transition-all duration-500 ${compact ? "glass px-3.5 py-2" : "px-0 py-0"}`}
+          className={`pointer-events-auto rounded-2xl text-ink transition-all duration-500 ${compact ? "border border-white/80 keep-blur bg-porcelain/90 px-3.5 py-2 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.25)] backdrop-blur-md" : "px-0 py-0"}`}
         >
           <NeaLogo className={`w-auto transition-all duration-500 ${compact ? "h-8" : "h-11"}`} />
         </Link>
