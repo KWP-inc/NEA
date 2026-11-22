@@ -6,8 +6,8 @@ export const site = {
   description:
     "NEA Precision Skin is a physician-managed skin and wellness clinic in NE Calgary. We combine Fotona laser, medical-grade skincare and injectables with gut, skin and vaginal microbiome testing and Registered Dietitian nutrition, so results start at the root cause.",
   url: process.env.NEXT_PUBLIC_SITE_URL || "https://neaprecisionskin.com",
-  phone: "587-892-5722",
-  phoneHref: "tel:+15878925722",
+  phone: "825-395-3349",
+  phoneHref: "tel:+18253953349",
   text: "403-973-0722",
   textHref: "sms:+14039730722",
   email: "nea@neaskincare.com",
@@ -38,6 +38,12 @@ export const site = {
     googleReviews:
       "https://www.google.com/search?q=NEA+Precision+Skin+Calgary#lrd=0x537165c23a866f87:0x91facf8b209c6ccd,1,,,,",
   },
+  /**
+   * NEA's online shop (Shopify). Paste the store address here, for example "https://shop.neaprecisionskin.com".
+   * While it is empty, no Shop link is shown anywhere. When set, "Shop" appears in the header, the More menu,
+   * the footer and on the skincare pages.
+   */
+  shop: process.env.NEXT_PUBLIC_SHOP_URL || "",
   ecosystem: {
     bioaroLabs: "https://bioarolabs.com/",
     bioaroShop: "https://bioarolabs.com/shop",
