@@ -6,7 +6,7 @@ import { site } from "@/lib/site";
 import { solveCaptcha } from "@/lib/captcha-client";
 import { track } from "@/lib/analytics";
 
-export type LeadKind = "skin-scan" | "consultation" | "contact" | "partner" | "magazine" | "experience";
+export type LeadKind = "skin-scan" | "consultation" | "contact" | "partner" | "magazine" | "experience" | "newsletter";
 
 type Field = { name: string; label: string; type?: "text" | "email" | "tel" | "select" | "textarea" | "number"; required?: boolean; options?: string[]; placeholder?: string; half?: boolean };
 
@@ -62,6 +62,14 @@ const PRESETS: Record<LeadKind, { fields: Field[]; submit: string; done: string 
       { name: "email", label: "Email", type: "email", required: true, half: true },
       { name: "phone", label: "Phone", type: "tel", half: true },
       { name: "members", label: "Members or clients (approx.)", type: "number", half: true },
+    ],
+  },
+  newsletter: {
+    submit: "Sign me up",
+    done: "You're on the list. The next issue comes to your inbox.",
+    fields: [
+      { name: "name", label: "Name", required: true, half: true },
+      { name: "email", label: "Email", type: "email", required: true, half: true },
     ],
   },
   magazine: {

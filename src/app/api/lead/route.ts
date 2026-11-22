@@ -21,7 +21,7 @@ export const dynamic = "force-dynamic";
  */
 const short = cleanText(120);
 const schema = z.object({
-  kind: z.enum(["skin-scan", "consultation", "contact", "partner", "magazine", "experience"]),
+  kind: z.enum(["skin-scan", "consultation", "contact", "partner", "magazine", "experience", "newsletter"]),
   source: short.optional(),
   captcha: z.string().max(2000),
   company_website: z.string().max(200).optional(), // honeypot: people never see it
