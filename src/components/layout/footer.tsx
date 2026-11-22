@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Instagram, Facebook } from "lucide-react";
+import { Instagram, Facebook, ShoppingBag } from "lucide-react";
 import { Logo } from "./logo";
 import { footerNav } from "@/content/nav";
 import { site } from "@/lib/site";
@@ -40,6 +40,11 @@ export function Footer() {
               <a href={site.social.facebook} target="_blank" rel="noreferrer" aria-label="NEA on Facebook" className="grid h-10 w-10 place-items-center rounded-full border border-ink/10 transition hover:bg-white">
                 <Facebook className="h-4 w-4" />
               </a>
+              {site.shop && (
+                <a href={site.shop} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center gap-2 rounded-full bg-ink px-4 text-[14px] font-medium text-porcelain transition hover:opacity-90">
+                  <ShoppingBag className="h-4 w-4" /> Shop online
+                </a>
+              )}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-10 md:grid-cols-3 xl:grid-cols-5">

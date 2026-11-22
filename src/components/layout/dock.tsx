@@ -107,6 +107,11 @@ function MoreSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
               <ThemePicker />
             </div>
             <div className="mt-8 flex flex-wrap gap-3 border-t border-ink/10 pt-6 text-[14px] text-graphite">
+              {site.shop && (
+                <a href={site.shop} target="_blank" rel="noreferrer" className="chip !bg-ink !text-[13px] !text-porcelain">
+                  Shop online
+                </a>
+              )}
               <a href={site.phoneHref} className="chip !text-[13px]">
                 {site.phone}
               </a>
