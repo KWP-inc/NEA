@@ -106,6 +106,9 @@ export function WelcomeForm() {
   return (
     <form onSubmit={submit} className="mx-auto w-full max-w-md space-y-4 rounded-[32px] border border-ink/10 bg-white/75 p-6 backdrop-blur md:p-8">
       <div>
+        {params.get("new") === "1" && (
+          <p className="mb-3 rounded-2xl bg-flora-soft px-4 py-3 text-[14px]">There's no account with this email yet, so let's make one. It takes a minute.</p>
+        )}
         <h1 className="font-display text-[2.2rem] leading-tight">Nice to meet you.</h1>
         <p className="mt-2 text-[15px] text-graphite">
           A few details for <strong className="text-ink">{email}</strong>.
