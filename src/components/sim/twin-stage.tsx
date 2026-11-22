@@ -1,4 +1,5 @@
 "use client";
+import { onScreenLoop } from "@/lib/on-screen-loop";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Camera, CameraOff, Loader2, ShieldCheck } from "lucide-react";
 import { IMG } from "@/content/media";
@@ -104,13 +105,17 @@ export function TwinStage({ look, children, className }: { look: TwinLook; child
   useEffect(() => {
     const c = canvas.current!;
     const ctx = c.getContext("2d")!;
-    let raf = 0;
+    let lastKey = "";
     const frame = () => {
-      raf = requestAnimationFrame(frame);
       const b = box.current;
       if (!b) return;
       const W = b.clientWidth;
       const H = b.clientHeight;
+      if (mode !== "camera") {
+        const key = `${W}x${H}|${crop.current.x},${crop.current.y},${crop.current.w}|${JSON.stringify(lookRef.current)}`;
+        if (key === lastKey) return; // nothing changed: skip the redraw
+        lastKey = key;
+      }
       const dpr = Math.min(2, window.devicePixelRatio || 1);
       if (c.width !== Math.round(W * dpr)) {
         c.width = Math.round(W * dpr);
@@ -136,8 +141,7 @@ export function TwinStage({ look, children, className }: { look: TwinLook; child
       }
       if (pts) paint(ctx, pts, lookRef.current);
     };
-    raf = requestAnimationFrame(frame);
-    return () => cancelAnimationFrame(raf);
+    return onScreenLoop(box.current, frame);
   }, [mode]);
 
   useEffect(() => () => stops.current.forEach((s) => s()), []);
