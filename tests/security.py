@@ -319,6 +319,8 @@ def main():
     check("staff stats work after two-step", st == 200 and "totals" in stats)
     st, _, html = boss.req("GET", f"/{ADMIN}", origin=None, raw=True)
     check("admin page opens for admin", st == 200 and "NEA staff" in html)
+    st, _, _ = boss.req("GET", "/staff-portal", origin=None, raw=True, headers={"x-nea-internal": "guess"})
+    check("internal staff path stays 404 even with a guessed header", st == 404)
     st, h, _ = boss.req("GET", f"/{ADMIN}", origin=None, raw=True)
     check("admin page is noindex + no-store", "noindex" in (h.get("X-Robots-Tag") or "") and "no-store" in (h.get("Cache-Control") or ""))
     st, d = boss.req("GET", "/api/staff/members?q=%27%20OR%201%3D1%20--", origin=None)
