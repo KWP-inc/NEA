@@ -1,4 +1,5 @@
 "use client";
+import { useTouchDevice } from "@/lib/use-touch";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll, useTransform, type MotionValue } from "framer-motion";
@@ -230,7 +231,7 @@ const LAYERS: Layer[] = [
 ];
 
 /** One full-screen texture that flies towards you as you scroll past its depth. */
-function DiveLayer({ layer, i, p }: { layer: Layer; i: number; p: MotionValue<number> }) {
+function DiveLayer({ layer, i, p, lite }: { layer: Layer; i: number; p: MotionValue<number>; lite: boolean }) {
   const cv = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const c = cv.current!;
@@ -244,7 +245,7 @@ function DiveLayer({ layer, i, p }: { layer: Layer; i: number; p: MotionValue<nu
   const opacity = useTransform(u, [-1, -0.45, 0, 0.55, 1], [0, 1, 1, 0.6, 0]);
   const blur = useTransform(u, [-1, 0, 0.5, 1], ["blur(10px)", "blur(0px)", "blur(1px)", "blur(14px)"]);
   return (
-    <motion.div className="absolute inset-0 will-change-transform [-webkit-mask-image:radial-gradient(ellipse_farthest-side,black_72%,transparent)] [mask-image:radial-gradient(ellipse_farthest-side,black_72%,transparent)]" style={{ scale, opacity, filter: blur, zIndex: 10 - i }}>
+    <motion.div className="absolute inset-0 will-change-transform [-webkit-mask-image:radial-gradient(ellipse_farthest-side,black_72%,transparent)] [mask-image:radial-gradient(ellipse_farthest-side,black_72%,transparent)]" style={{ scale, opacity, filter: lite ? undefined : blur, zIndex: 10 - i }}>
       <canvas ref={cv} aria-hidden className="h-full w-full object-cover" />
     </motion.div>
   );
@@ -262,13 +263,14 @@ export function SkinDive() {
   useMotionValueEvent(p, "change", (v) => setIdx(Math.max(0, Math.min(LAYERS.length - 1, Math.round(v)))));
   const meter = useTransform(p, [0, LAYERS.length - 1], ["0%", "100%"]);
   const L = LAYERS[idx];
+  const lite = useTouchDevice();
 
   return (
     <section ref={ref} aria-label="Skin Dive" className="relative" style={{ height: `${LAYERS.length * 85 + 40}svh` }}>
       <div className="sticky top-0 h-[100svh] overflow-hidden bg-[#140e10]">
         <div className="absolute inset-0">
           {LAYERS.map((l, i) => (
-            <DiveLayer key={l.id} layer={l} i={i} p={p} />
+            <DiveLayer key={l.id} layer={l} i={i} p={p} lite={lite} />
           ))}
           {/* lens: soft vignette and a magnifier ring */}
           <div aria-hidden className="pointer-events-none absolute inset-0 z-20" style={{ background: "radial-gradient(70% 65% at 50% 50%, transparent 55%, rgba(12,8,10,0.85) 100%)" }} />
