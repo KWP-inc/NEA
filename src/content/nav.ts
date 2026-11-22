@@ -60,6 +60,7 @@ export const footerNav: { title: string; links: NavItem[] }[] = [
       { label: "Clinic gallery", href: "/gallery" },
       { label: "Journal", href: "/blog" },
       { label: "NEA Magazine", href: "/magazine" },
+      { label: "Newsletters", href: "/newsletters" },
       { label: "Partner with us", href: "/partners" },
       { label: "FAQ", href: "/faq" },
       { label: "Contact", href: "/contact" },
