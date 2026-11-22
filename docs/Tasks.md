@@ -48,13 +48,23 @@ Last updated: 18 Nov 2026 (update 26) · ✅ done · ⬜ to do · ❓ needs an o
 - ✅ robots.txt keeps private pages out. AI answer bots welcomed
 - ✅ `llms.txt` updated, plus `/llms-full.txt` (every program, treatment and FAQ)
 - ✅ Search Console and Bing verification by env (or DNS). IndexNow key + `npm run seo:indexnow`
-- ✅ Phone number is now **587-892-5722** everywhere (site, schema, llms, old blog text)
+- ✅ Phone number is now **825-395-3349** everywhere (site, schema, llms, old blog text)
 
 ## ✅ Phase 7: Speed and deployment
 - ✅ Public pages are static and cached. Fonts are self-hosted (no Google call)
 - ✅ Nginx config with page caching, HTTPS and real-IP. PM2 config (1 process per core). DEPLOY.md
 - ✅ Load tested (docs/Testing.md). Health check `/api/health`
 - ✅ Vercel files removed. Cron moved to the server
+
+## ✅ Phase 8: Owner feedback (update 27, 21 Nov 2026)
+1. ✅ Phones: no stuck photos, native scrolling, no background blur on cards, swipe gallery, lighter home page
+2. ✅ Glow Feed on phones: vertical swipe feed like Instagram Reels; newest posts auto-added when the Instagram token is set
+3. ✅ Accounts: separate Sign in / Create account tabs; a friendly message (and device-only saving) when accounts aren't set up on a copy of the site
+4. ✅ Content repair: 69 joined paragraphs split back into lists; Perfect Peel, Large Pores, ZO kits, Perfect Derma Peel, Rosacea wording
+5. ✅ Phone number 825-395-3349 everywhere
+6. ✅ Newsletters page (`/newsletters`) and sign-up; Shop link ready (`NEXT_PUBLIC_SHOP_URL`)
+7. ✅ Staff page fix (Next.js ran the middleware twice); `deploy/release.sh` with a stale-cache check
+8. ✅ Tests: Selenium + Lighthouse added; all suites pass
 
 ## ⬜ Still to do
 1. ⬜ **DevOps:** follow DEPLOY.md (database, env, Nginx, PM2, cron, SPF/DKIM/DMARC for email)
@@ -65,3 +75,6 @@ Last updated: 18 Nov 2026 (update 26) · ✅ done · ⬜ to do · ❓ needs an o
 6. ❓ Glow Club rewards and points (placeholders in `src/content/club.ts`)
 7. ❓ Sales agents: decide after launch (PRD §8)
 8. ⬜ After launch: submit the sitemap in Search Console and Bing, run IndexNow
+9. ⬜ **Owner:** send the October and November newsletter PDFs → put them in `public/newsletters/` and fill `file` in `src/content/newsletters.ts`
+10. ⬜ **Owner:** send NEA's Shopify store address → set `NEXT_PUBLIC_SHOP_URL`
+11. ⬜ **Owner/DevOps:** Instagram token for the auto-updating feed (DEPLOY.md §2.10)
