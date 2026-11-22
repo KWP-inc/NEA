@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, type CSSProperties, type ReactNode } from "
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { nea, cn } from "@/lib/utils";
+import { useTouchDevice } from "@/lib/use-touch";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -13,7 +14,30 @@ export type SphereCard = { src: string; alt: string; caption?: string };
  * As you scroll, the cards fan out from the core to the sphere surface
  * and the whole sphere rotates in full 3D space.
  */
-export function ScrollSphereGallery({ cards, className, children }: { cards: SphereCard[]; className?: string; children?: ReactNode }) {
+export function ScrollSphereGallery(props: { cards: SphereCard[]; className?: string; children?: ReactNode }) {
+  // Phones and tablets get a simple swipe row: the 3D sphere pinned the screen and stuttered on touch scrolling.
+  const touch = useTouchDevice();
+  return touch ? <SwipeGallery {...props} /> : <SphereGallery {...props} />;
+}
+
+function SwipeGallery({ cards, className, children }: { cards: SphereCard[]; className?: string; children?: ReactNode }) {
+  return (
+    <section className={cn("py-16", className)}>
+      {children && <div className="container mb-6 text-center">{children}</div>}
+      <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Photos from inside the clinic">
+        {cards.map((c, i) => (
+          <figure key={i} className="relative h-[300px] w-[230px] shrink-0 snap-center overflow-hidden rounded-3xl bg-mist">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={nea(c.src)} alt={c.alt} loading="lazy" decoding="async" className="h-full w-full object-cover" />
+            {c.caption && <figcaption className="absolute inset-x-2 bottom-2 rounded-xl bg-black/45 px-3 py-1.5 text-[12.5px] text-white">{c.caption}</figcaption>}
+          </figure>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function SphereGallery({ cards, className, children }: { cards: SphereCard[]; className?: string; children?: ReactNode }) {
   const section = useRef<HTMLElement>(null);
   const sphere = useRef<HTMLDivElement>(null);
 
@@ -58,7 +82,7 @@ export function ScrollSphereGallery({ cards, className, children }: { cards: Sph
 
   return (
     <section ref={section} className={cn("relative h-[340vh]", className)}>
-      <div className="sticky top-0 flex h-screen items-center justify-center overflow-hidden">
+      <div className="sticky top-0 flex h-[100svh] items-center justify-center overflow-hidden">
         {children && <div className="pointer-events-none absolute inset-x-0 top-[12vh] z-20 text-center">{children}</div>}
         <div className="relative h-full w-full [perspective:1400px]">
           <div
