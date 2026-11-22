@@ -49,7 +49,7 @@ export function ReelsStrip() {
           </div>
           <div className="flex flex-wrap gap-2">
             <button onClick={() => open(0)} className="btn-primary">
-              <Aperture className="h-4 w-4" /> Open Glow Feed
+              <Aperture className="h-4 w-4" /> Watch all videos
             </button>
             <FollowButton />
           </div>
