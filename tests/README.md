@@ -5,7 +5,8 @@ All reports go to `tests/out/`.
 
 ## Setup (once)
 ```bash
-pip install playwright aiosmtpd          # browser tests use Chrome (CHROME=/usr/bin/google-chrome) or: playwright install chromium
+pip install playwright aiosmtpd selenium chromedriver-py   # browsers: Chrome (CHROME=/usr/bin/google-chrome); chromedriver-py must match your Chrome version
+npm i -g lighthouse                        # speed test
 npm run db:migrate                        # local Postgres (docker compose up -d works)
 # catch emails locally, so the tests can read sign-in codes (keep it running in its own terminal):
 python3 tests/smtp_catch.py /tmp/mail
@@ -17,10 +18,12 @@ In `.env.local` set `SMTP_HOST=127.0.0.1`, `SMTP_PORT=2525` and `CLUB_CODES="GLO
 set -a; . ./.env.local; set +a            # gives the tests ADMIN_PATH and DATABASE_OWNER_URL
 export BASE=http://localhost:3000 MAIL_DIR=/tmp/mail
 
-npm run test:security   # 79 API and security checks: sign-up, ages, points, IDOR, CSRF, SQLi, XSS, rate limits, captcha, MFA, uploads, delete
+npm run test:security   # 89 API and security checks: sign-up, ages, points, IDOR, CSRF, SQLi, XSS, rate limits, captcha, MFA, uploads, delete
 npm run test:links      # crawls every page: broken links, missing files, title/description/h1/og:image/canonical/JSON-LD, old URL redirects
 npm run test:e2e        # Chrome, phone + desktop: every key page, tabs, console and CSP errors, cookie banner, sign-up, staff page
-npm run test:load       # autocannon: 200 users at once on pages, 100 on APIs
+npm run test:selenium   # Selenium (second, independent browser driver), phone + desktop: pages, stuck photos, sign-in tabs, content, Glow Feed
+npm run test:perf       # Lighthouse, phone + desktop: speed, accessibility, best practices, SEO
+npm run test:load       # autocannon: 200 users at once on pages, 100 on APIs (REPORT=tests/out/x.md to name the report)
 ```
 
 ## Live face scan with a fake camera
