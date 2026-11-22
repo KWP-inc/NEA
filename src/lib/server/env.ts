@@ -55,3 +55,7 @@ export const env = {
 export const hasGoogle = () => Boolean(env.google.id && env.google.secret);
 export const hasApple = () => Boolean(env.apple.id && env.apple.team && env.apple.keyId && env.apple.key);
 export const hasDb = () => Boolean(process.env.DATABASE_URL);
+
+/** Member accounts need a database and a way to email sign-in codes (in development the code is printed instead). */
+export const accountsReady = () =>
+  hasDb() && Boolean(process.env.AUTH_PEPPER && process.env.SESSION_SECRET && process.env.ALTCHA_HMAC_KEY) && (Boolean(process.env.SMTP_HOST) || !env.isProd);
