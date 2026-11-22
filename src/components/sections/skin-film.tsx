@@ -24,7 +24,7 @@ export function SkinFilmChapter() {
           <ol className="mt-8 space-y-5">
             {points.map(([t, d], i) => (
               <li key={t} className="flex gap-4">
-                <span className="tabular mt-0.5 font-display text-[1.4rem] leading-none text-ink/30">0{i + 1}</span>
+                <span className="tabular mt-0.5 font-display text-[1.4rem] leading-none text-ink/65">0{i + 1}</span>
                 <span>
                   <span className="block text-[17px] font-medium text-ink">{t}</span>
                   <span className="block text-[15px] text-graphite">{d}</span>
@@ -44,7 +44,7 @@ export function SkinFilmChapter() {
         <div className="relative mx-auto w-[min(78vw,360px)] lg:w-[380px]">
           <div aria-hidden className="absolute -inset-10 -z-10 rounded-full opacity-60 blur-3xl" style={{ background: "var(--aurora)" }} />
           <div className="relative aspect-[9/16] overflow-hidden rounded-[44px] bg-ink shadow-[0_50px_120px_-50px_rgba(var(--shadow-tint),0.8)] ring-1 ring-ink/10">
-            <LoopVideo src="/media/nea-hero.mp4" poster="/media/nea-hero.jpg" label="A face scanned by NEA's skin analysis" className="absolute inset-0 h-full w-full" />
+            <LoopVideo src="/media/nea-hero.mp4" small="/media/nea-hero-sm.mp4" poster="/media/nea-hero.jpg" label="A face scanned by NEA's skin analysis" className="absolute inset-0 h-full w-full" />
             <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-black/35 px-3 py-1 text-[11.5px] text-white backdrop-blur-md">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#f3d9a4]" /> Scanning
             </span>
