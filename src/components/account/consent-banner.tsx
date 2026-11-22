@@ -10,7 +10,9 @@ import { consent, setConsent, track } from "@/lib/analytics";
  * visit counts (no ad trackers either way). Also records page views once allowed.
  */
 export function ConsentBanner() {
-  const [show, setShow] = useState(false);
+  // Drawn with the page from the first paint (no pop-in a few seconds later). For people who already chose,
+  // the small script in <head> hides it before anything is painted (html.nea-consented).
+  const [show, setShow] = useState(true);
   const path = usePathname();
   useEffect(() => setShow(consent() === null), []);
   useEffect(() => {
@@ -19,11 +21,12 @@ export function ConsentBanner() {
   if (!show) return null;
   const pick = (v: "all" | "essential") => {
     setConsent(v);
+    document.documentElement.classList.add("nea-consented");
     setShow(false);
     if (v === "all") track("page_view");
   };
   return (
-    <div className="fixed inset-x-3 bottom-[92px] z-[80] mx-auto max-w-lg rounded-3xl border border-ink/10 bg-porcelain/95 p-4 text-ink shadow-xl backdrop-blur-md md:bottom-6" role="dialog" aria-label="Cookie choice">
+    <div id="nea-consent" className="fixed inset-x-3 bottom-[92px] z-[80] mx-auto max-w-lg rounded-3xl border border-ink/10 bg-porcelain/95 p-4 text-ink shadow-xl backdrop-blur-md md:bottom-6" role="dialog" aria-label="Cookie choice">
       <p className="flex items-start gap-2 text-[14px] leading-relaxed">
         <Cookie className="mt-0.5 h-4 w-4 shrink-0 text-flora" />
         <span>
