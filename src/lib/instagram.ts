@@ -9,7 +9,7 @@ type Media = { id: string; caption?: string; media_type: "IMAGE" | "VIDEO" | "CA
 
 const API = "https://graph.instagram.com";
 
-/** Newest Instagram videos as embeddable links. Cached for an hour. Returns [] when not set up. */
+/** Newest Instagram posts (Reels, photos and carousels) as embeddable links. Cached for an hour. Returns [] when not set up. */
 export async function getInstagramVideos(max = 30): Promise<SocialVideo[]> {
   const token = process.env.INSTAGRAM_ACCESS_TOKEN;
   if (!token) return [];
@@ -24,7 +24,6 @@ export async function getInstagramVideos(max = 30): Promise<SocialVideo[]> {
       }
       const data = (await res.json()) as { data?: Media[]; paging?: { next?: string } };
       for (const m of data.data ?? []) {
-        if (m.media_type !== "VIDEO") continue;
         out.push({ url: m.permalink, caption: m.caption ?? "", date: m.timestamp });
         if (out.length >= max) break;
       }
