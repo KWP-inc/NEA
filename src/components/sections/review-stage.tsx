@@ -1,4 +1,5 @@
 "use client";
+import { onScreenLoop } from "@/lib/on-screen-loop";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
@@ -24,18 +25,17 @@ export function ReviewStage({ reviews }: { reviews: Review[] }) {
 
   useEffect(() => {
     if (paused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    let raf = 0;
-    let last = performance.now();
+    let last = 0;
+    let done = false;
     const loop = (now: number) => {
-      elapsed.current += now - last;
+      if (done) return;
+      elapsed.current += last ? Math.min(now - last, 100) : 0;
       last = now;
       const p = Math.min(1, elapsed.current / DWELL);
       ring.current?.style.setProperty("stroke-dashoffset", String(100 - p * 100));
-      if (p >= 1) return go(i + 1);
-      raf = requestAnimationFrame(loop);
+      if (p >= 1) (done = true), go(i + 1);
     };
-    raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
+    return onScreenLoop(ring.current?.closest("section") ?? ring.current, loop);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [i, paused]);
 
@@ -53,7 +53,7 @@ export function ReviewStage({ reviews }: { reviews: Review[] }) {
         <AnimatePresence mode="wait">
           <motion.figure key={i} initial={{ opacity: 0, y: 14, filter: "blur(8px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} exit={{ opacity: 0, y: -10, filter: "blur(6px)" }} transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}>
             <div className="flex flex-wrap items-center gap-3">
-              <span className="flex gap-0.5 text-[#d58f63]" aria-label={r.source === "Google" ? "Google review" : "Client testimonial"}>
+              <span role="img" className="flex gap-0.5 text-[#d58f63]" aria-label={r.source === "Google" ? "Google review" : "Client testimonial"}>
                 {Array.from({ length: 5 }, (_, k) => (
                   <Star key={k} className="h-4 w-4 fill-current" />
                 ))}
@@ -78,7 +78,7 @@ export function ReviewStage({ reviews }: { reviews: Review[] }) {
             const on = k === i;
             return (
               <button key={k} onClick={() => go(k)} aria-label={`Review from ${nameOf(x)}, ${x.treatment}`} aria-current={on} title={`${nameOf(x)} · ${x.treatment}`} className="relative grid h-11 w-11 shrink-0 place-items-center">
-                <span className={cn("grid h-9 w-9 place-items-center rounded-full text-[12px] font-semibold transition", on ? "text-ink [background:var(--aurora)]" : "bg-ink/[0.05] text-ink/60 hover:bg-ink/10")}>{initials(x)}</span>
+                <span aria-hidden className={cn("grid h-9 w-9 place-items-center rounded-full text-[12px] font-semibold transition", on ? "text-ink [background:var(--aurora)]" : "bg-ink/[0.05] text-ink/75 hover:bg-ink/10")}>{initials(x)}</span>
                 {on && (
                   <svg viewBox="0 0 44 44" className="absolute inset-0 -rotate-90" aria-hidden>
                     <circle ref={ring} cx="22" cy="22" r="20.5" fill="none" stroke="rgb(var(--c-ink))" strokeWidth="1.5" pathLength={100} strokeDasharray="100" strokeDashoffset="100" strokeLinecap="round" />
