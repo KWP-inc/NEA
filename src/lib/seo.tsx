@@ -24,7 +24,7 @@ export function clinicSchema() {
     description: site.description,
     slogan: site.tagline,
     url: site.url,
-    telephone: "+1-587-892-5722",
+    telephone: "+1-825-395-3349",
     email: site.email,
     image: "https://neaprecisionskin.com/wp-content/uploads/2023/11/Asset-18.png",
     priceRange: "$$",

@@ -30,7 +30,7 @@ function wrap(title: string, bodyHtml: string) {
 <p style="font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#b0396b;margin:0 0 12px">NEA Precision Skin</p>
 <h1 style="font-family:Georgia,serif;font-weight:400;font-size:28px;margin:0 0 16px">${esc(title)}</h1>
 ${bodyHtml}
-<p style="font-size:12px;color:#625868;margin-top:32px">#104, 3151 27 Street NE, Calgary · 587-892-5722<br>You got this email because someone used this address on neaprecisionskin.com.</p>
+<p style="font-size:12px;color:#625868;margin-top:32px">#104, 3151 27 Street NE, Calgary · 825-395-3349<br>You got this email because someone used this address on neaprecisionskin.com.</p>
 </div></body></html>`;
 }
 

@@ -14,7 +14,7 @@ function AccountPrivacy() {
     ["Under 18", "You must be 16 or older to make an account. Under 18 needs a parent's yes first, and we never send marketing to under-18s."],
     ["Where it's kept", "On NEA's own secured database in Canada. Only NEA staff with two-step sign-in can see member details, and every staff action is logged."],
     ["Cookies", "One cookie keeps you signed in. With your OK, a first-party ID counts visits. No ad trackers and no selling of data."],
-    ["Your choices", "Download all your data or delete your account any time from your account page. Change your email choices there too. Questions: nea@neaskincare.com or 587-892-5722."],
+    ["Your choices", "Download all your data or delete your account any time from your account page. Change your email choices there too. Questions: nea@neaskincare.com or 825-395-3349."],
   ];
   return (
     <div className="mb-12 rounded-[28px] border border-ink/10 bg-white/70 p-6 md:p-8">
