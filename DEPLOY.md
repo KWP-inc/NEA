@@ -96,7 +96,12 @@ Without this, the Glow Feed shows the videos listed in `src/content/reels.ts`. W
 - **Shop:** set `NEXT_PUBLIC_SHOP_URL=https://<NEA's Shopify store>` and rebuild. A "Shop online" link then shows in the footer, the More menu and the skincare pages. Empty = hidden.
 - **Newsletters:** put the PDF in `public/newsletters/` (e.g. `2026-11.pdf`, optional cover `2026-11.jpg`) and fill `file` in `src/content/newsletters.ts`. Issues without a file stay hidden.
 
-### 2.12 The Vercel preview (showcase only)
+### 2.12 Testing accounts on your own computer
+`npm start` is production mode, so without an email server the sign-in page says "Accounts open soon".
+On localhost it also lists exactly what's missing. To test without email, add `EMAIL_TO_CONSOLE=1` to `.env.local`
+and restart: the 6-digit code is printed in the terminal. **Never set it on the real server.**
+
+### 2.13 The Vercel preview (showcase only)
 The Vercel copy has no database or email, so:
 - the sign-in page says **"Accounts open soon"** (no errors), and
 - Skin Diary, Routine and the other My Glow tools work and save **on that device only**.
