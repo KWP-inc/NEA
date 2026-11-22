@@ -13,6 +13,7 @@ import { RefCapture } from "@/components/glow/ref-capture";
 import { AccountProvider } from "@/components/account/account-provider";
 import { ConsentBanner } from "@/components/account/consent-banner";
 import { SmoothScroll } from "@/components/layout/smooth-scroll";
+import { PauseOffscreen } from "@/components/layout/pause-offscreen";
 import { JsonLd, clinicSchema } from "@/lib/seo";
 import { site } from "@/lib/site";
 import { themeInitScript } from "@/components/theme/init";
@@ -97,6 +98,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </div>
         <JsonLd data={clinicSchema()} />
         <SmoothScroll />
+        <PauseOffscreen />
         <AccountProvider>
         <BookingProvider>
           <AiProvider>
