@@ -28,7 +28,7 @@ export function SignInFlow() {
   const params = useSearchParams();
   const next = typeof window === "undefined" ? "/account" : safeNext(params.get("next"));
   const router = useRouter();
-  const { refresh, providers, accounts, ready } = useAccount();
+  const { refresh, providers, accounts, ready, missing } = useAccount();
   const [mode, setMode] = useState<"signin" | "join">(params.get("mode") === "join" ? "join" : "signin");
   const [step, setStep] = useState<"email" | "code">("email");
   const [email, setEmail] = useState("");
@@ -115,6 +115,16 @@ export function SignInFlow() {
           <p className="mt-2 text-[15px] text-graphite">
             Member accounts aren't switched on for this site yet. You can still use every free tool: the live face scan, Skin Lens, Nea SI and booking.
           </p>
+          {missing.length > 0 && (
+            <div className="mt-5 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-[13.5px] text-ink">
+              <p className="font-medium">Only you see this (localhost). Add to .env.local, then restart:</p>
+              <ul className="mt-2 list-disc space-y-1 pl-5 font-mono text-[12.5px]">
+                {missing.map((m) => (
+                  <li key={m}>{m}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </>
       ) : step === "email" ? (
         <>
