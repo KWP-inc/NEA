@@ -52,7 +52,7 @@ export function GlowDrop({ className }: { className?: string }) {
     let H = 0;
     let dpr = 1;
     const size = () => {
-      dpr = Math.min(2, window.devicePixelRatio || 1);
+      dpr = Math.min(window.matchMedia("(pointer: coarse)").matches ? 1.5 : 2, window.devicePixelRatio || 1);
       const r = c.getBoundingClientRect();
       W = r.width;
       H = r.height;
@@ -74,9 +74,14 @@ export function GlowDrop({ className }: { className?: string }) {
     const t0 = performance.now();
     const N = 120;
 
+    // phones: 30 frames a second is plenty for a slow liquid and halves the work
+    const touch = window.matchMedia("(pointer: coarse)").matches;
+    let drawn = 0;
     const frame = (now: number) => {
       raf = requestAnimationFrame(frame);
-      if (!visible || !W) return;
+      if (!visible || !W || document.visibilityState !== "visible") return;
+      if (touch && now - drawn < 32) return;
+      drawn = now;
       const t = reduce ? 0 : (now - t0) / 1000;
       const s = st.current;
       const w = WISHES[s.on];
