@@ -1,4 +1,5 @@
 "use client";
+import { onScreenLoop } from "@/lib/on-screen-loop";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
@@ -23,10 +24,9 @@ export function FocusedMarquee({ items, className, speed = 38, tile = 104, gap =
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let raf = 0;
     const s = state.current;
+    const touch = window.matchMedia("(pointer: coarse)").matches;
     const frame = (t: number) => {
-      raf = requestAnimationFrame(frame);
       const el = wrap.current;
       if (!el) return;
       const dt = s.last ? Math.min((t - s.last) / 1000, 0.05) : 0;
@@ -52,7 +52,7 @@ export function FocusedMarquee({ items, className, speed = 38, tile = 104, gap =
         const z = focus * 120 - ad * 60;
         node.style.transform = `translate3d(${x}px,-50%,${z}px) rotateY(${rot}deg) scale(${scale})`;
         node.style.opacity = String(Math.max(0, 1 - Math.max(0, ad - 0.75) * 1.8));
-        node.style.filter = focus > 0.55 ? "none" : `blur(${(0.55 - focus) * 2.2}px) saturate(${0.75 + focus * 0.5})`;
+        node.style.filter = touch || focus > 0.55 ? "none" : `blur(${(0.55 - focus) * 2.2}px) saturate(${0.75 + focus * 0.5})`;
         node.style.zIndex = String(Math.round(focus * 100));
         if (Math.abs(center - cx) < best) {
           best = Math.abs(center - cx);
@@ -64,8 +64,7 @@ export function FocusedMarquee({ items, className, speed = 38, tile = 104, gap =
         label.current.textContent = loop[bestI]?.label ?? "";
       }
     };
-    raf = requestAnimationFrame(frame);
-    return () => cancelAnimationFrame(raf);
+    return onScreenLoop(wrap.current, frame);
   }, [loop, step, total, tile]);
 
   const slow = () => (state.current.target = speed * 0.12);
