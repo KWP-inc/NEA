@@ -1,4 +1,5 @@
 "use client";
+import { onScreenLoop } from "@/lib/on-screen-loop";
 import { useCallback, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 
@@ -35,11 +36,9 @@ export function MorphingText({ texts, className }: { texts: string[]; className?
       if (t1.current) t1.current.textContent = texts[0];
       return;
     }
-    let raf = 0;
     const tick = () => {
-      raf = requestAnimationFrame(tick);
       const now = new Date();
-      const dt = (now.getTime() - last.current.getTime()) / 1000;
+      const dt = Math.min(0.1, (now.getTime() - last.current.getTime()) / 1000);
       last.current = now;
       cool.current -= dt;
       if (cool.current <= 0) {
@@ -67,8 +66,8 @@ export function MorphingText({ texts, className }: { texts: string[]; className?
         }
       }
     };
-    tick();
-    return () => cancelAnimationFrame(raf);
+    last.current = new Date();
+    return onScreenLoop(t1.current?.parentElement, tick, "0px");
   }, [setStyles, texts]);
 
   return (
