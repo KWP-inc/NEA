@@ -8,6 +8,7 @@ import { useBooking } from "@/components/booking/booking";
 import { cleanCaption, embedFor, embedHeight, reelTopic, socialVideos, type Platform, type SocialVideo } from "@/content/reels";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/utils";
+import { useTouchDevice } from "@/lib/use-touch";
 
 type Ctx = { open: (start?: number) => void; load: () => void; videos: SocialVideo[] };
 const ReelsCtx = createContext<Ctx>({ open: () => {}, load: () => {}, videos: socialVideos });
@@ -91,7 +92,107 @@ function useFit(platform: Platform) {
   return w;
 }
 
-function Viewer({ videos, start, onClose }: { videos: SocialVideo[]; start: number; onClose: () => void }) {
+function Viewer(props: { videos: SocialVideo[]; start: number; onClose: () => void }) {
+  // phones and tablets: a vertical swipe feed like Instagram Reels. Computers: one player with arrows.
+  const touch = useTouchDevice();
+  return touch ? <PhoneFeed {...props} /> : <DesktopViewer {...props} />;
+}
+
+/** Full-screen vertical feed: swipe up for the next video, like Instagram Reels. Only the videos near the screen load. */
+function PhoneFeed({ videos, start, onClose }: { videos: SocialVideo[]; start: number; onClose: () => void }) {
+  const list = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(Math.min(start, videos.length - 1));
+  const [w, setW] = useState(360);
+
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const fit = () => setW(Math.min(440, window.innerWidth - 24));
+    fit();
+    window.addEventListener("resize", fit);
+    const k = (ev: KeyboardEvent) => ev.key === "Escape" && onClose();
+    window.addEventListener("keydown", k);
+    // open at the video that was tapped
+    const el = list.current?.children[start] as HTMLElement | undefined;
+    el?.scrollIntoView({ block: "start" });
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("resize", fit);
+      window.removeEventListener("keydown", k);
+    };
+  }, [onClose, start]);
+
+  // which video is on screen
+  useEffect(() => {
+    const root = list.current;
+    if (!root) return;
+    const io = new IntersectionObserver(
+      (es) => es.forEach((en) => en.isIntersecting && setActive(Number((en.target as HTMLElement).dataset.i))),
+      { root, threshold: 0.6 },
+    );
+    Array.from(root.children).forEach((c) => io.observe(c));
+    return () => io.disconnect();
+  }, [videos.length]);
+
+  return (
+    <motion.div role="dialog" aria-modal="true" aria-label="Glow Feed" className="fixed inset-0 z-[88] bg-black text-white" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} data-lenis-prevent>
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-center justify-between bg-gradient-to-b from-black/70 to-transparent p-3 pt-[max(12px,env(safe-area-inset-top))]">
+        <p className="font-display text-[20px] leading-none">Glow Feed</p>
+        <div className="pointer-events-auto flex items-center gap-2">
+          <span className="tabular rounded-full bg-white/15 px-3 py-1.5 text-[12.5px]">
+            {active + 1} / {videos.length}
+          </span>
+          <button onClick={onClose} aria-label="Close" className="grid h-10 w-10 place-items-center rounded-full bg-white/15">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+      </div>
+      <div ref={list} className="h-[100dvh] snap-y snap-mandatory overflow-y-auto overscroll-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {videos.map((v, i) => (
+          <FeedItem key={v.url} v={v} i={i} w={w} live={Math.abs(i - active) <= 1} />
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+function FeedItem({ v, i, w, live }: { v: SocialVideo; i: number; w: number; live: boolean }) {
+  const e = embedFor(v.url)!;
+  const h = embedHeight(e.platform, w);
+  const book = useBooking();
+  const ai = useAi();
+  const topic = reelTopic(v.caption ?? "");
+  const caption = cleanCaption(v.caption ?? "");
+  return (
+    <section data-i={i} className="flex h-[100dvh] snap-start snap-always flex-col items-center justify-center gap-3 px-3 pb-[max(12px,env(safe-area-inset-bottom))] pt-16">
+      <div className="relative min-h-0 shrink overflow-hidden rounded-[20px] bg-white" style={{ width: w, height: h, maxHeight: "calc(100dvh - 190px)" }}>
+        <div className="absolute inset-0 grid place-items-center text-[13px] text-black/40">Loading video…</div>
+        {live && (
+          <iframe src={e.src} title={caption || "NEA video"} width={w} height={e.platform === "instagram" ? h + 170 : h} className="relative block border-0" allow="autoplay; encrypted-media; picture-in-picture; clipboard-write; web-share" allowFullScreen scrolling="no" />
+        )}
+      </div>
+      <div className="w-full max-w-md shrink-0">
+        {caption && <p className="mb-2 line-clamp-2 text-[13.5px] text-white/85">{caption}</p>}
+        <div className="flex items-center gap-2">
+          <button onClick={() => book.open(topic.key, topic.label)} className="flex min-w-0 flex-1 items-center justify-center gap-2 rounded-full bg-white px-4 py-3 text-[13.5px] font-medium text-ink">
+            <CalendarHeart className="h-4 w-4 shrink-0" /> <span className="truncate">{topic.key === "popular" ? "Book a visit" : `Book ${topic.label}`}</span>
+          </button>
+          <button onClick={() => ai.open({ context: topic.label, query: caption ? `Tell me about this: ${caption.slice(0, 140)}` : `Tell me about ${topic.label}` })} aria-label="Ask Nea SI" className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white/15">
+            <Sparkles className="h-5 w-5" />
+          </button>
+          {FOLLOW[e.platform].href && (
+            <a href={FOLLOW[e.platform].href} target="_blank" rel="noreferrer" aria-label={FOLLOW[e.platform].label} className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-white" style={{ background: FOLLOW[e.platform].bg }}>
+              {FOLLOW[e.platform].icon}
+            </a>
+          )}
+        </div>
+        {i === 0 && <p className="mt-2 text-center text-[12px] text-white/50">Swipe up for the next video</p>}
+      </div>
+    </section>
+  );
+}
+
+function DesktopViewer({ videos, start, onClose }: { videos: SocialVideo[]; start: number; onClose: () => void }) {
   const [i, setI] = useState(Math.min(start, videos.length - 1));
   const v = videos[Math.min(i, videos.length - 1)];
   const e = embedFor(v.url)!;
