@@ -85,12 +85,35 @@ Test a restore once a month: `createdb nea_restore && pg_restore -d nea_restore 
 2. **Bing Webmaster Tools:** import from Search Console, or verify with `BING_SITE_VERIFICATION`, then submit the sitemap.
 3. **IndexNow:** set `INDEXNOW_KEY`, then after each release run `SITE_URL=https://neaprecisionskin.com npm run seo:indexnow`.
 
+### 2.10 Instagram feed that updates itself (optional)
+Without this, the Glow Feed shows the videos listed in `src/content/reels.ts`. With it, NEA's newest posts and Reels appear by themselves (checked every hour).
+1. developers.facebook.com → **Create app** → type **Business** → add the product **Instagram** → "API setup with Instagram login".
+2. Add `@neaprecisionskin` (a Business or Creator account) and **Generate token**.
+3. Put it in `.env.local` as `INSTAGRAM_ACCESS_TOKEN=...`, then `pm2 reload all`.
+4. The weekly cron job in §2.6 keeps the token alive (tokens last 60 days).
+
+### 2.11 Shop link and newsletters
+- **Shop:** set `NEXT_PUBLIC_SHOP_URL=https://<NEA's Shopify store>` and rebuild. A "Shop online" link then shows in the footer, the More menu and the skincare pages. Empty = hidden.
+- **Newsletters:** put the PDF in `public/newsletters/` (e.g. `2026-11.pdf`, optional cover `2026-11.jpg`) and fill `file` in `src/content/newsletters.ts`. Issues without a file stay hidden.
+
+### 2.12 The Vercel preview (showcase only)
+The Vercel copy has no database or email, so:
+- the sign-in page says **"Accounts open soon"** (no errors), and
+- Skin Diary, Routine and the other My Glow tools work and save **on that device only**.
+To try real accounts there, add `DATABASE_URL`, `DATABASE_OWNER_URL`, `AUTH_PEPPER`, `SESSION_SECRET`, `ALTCHA_HMAC_KEY` and the `SMTP_*` settings in Vercel → Settings → Environment Variables, run `npm run db:migrate` against that database once, and redeploy. The real launch uses NEA's own server (this guide), not Vercel.
+
 ## 3. Before the domain moves off WordPress (must do)
 1. On any computer with internet: `npm run media:migrate`. This copies NEA's photos from WordPress into `public/media/wp`.
 2. Commit `public/media/wp` and `src/content/generated/wp-local.json`, then rebuild.
 3. Check the old WordPress URLs redirect (they are in `next.config.mjs`). The free-scan poster QR code points to `/free-scan`, which must stay live forever.
 
 ## 4. Every release
+One command does everything below and then checks the live site really shows the new version
+(it fails loudly if an old cached page is still being served):
+```bash
+cd /srv/nea && bash deploy/release.sh
+```
+The same steps by hand:
 ```bash
 cd /srv/nea && git pull
 npm ci
