@@ -56,8 +56,8 @@ export function SkinTwin({ className }: { className?: string }) {
 
   return (
     <div className={cn("grid items-center gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:gap-14", className)}>
-      {/* the twin: a real face, or yours (stays in view on phones while you move the sliders) */}
-      <div className="sticky top-14 z-20 lg:static">
+      {/* the twin: a real face, or yours. Not sticky: on phones a pinned photo looked stuck while the page moved */}
+      <div className="relative">
         <TwinStage look={m} className="mx-auto aspect-[4/5] max-h-[48svh] w-full max-w-[520px] lg:max-h-none">
         {/* score */}
           <div className="glass absolute bottom-3 left-1/2 flex w-[92%] -translate-x-1/2 items-center gap-3 rounded-3xl px-4 py-2.5 sm:gap-5 sm:px-5 sm:py-4 lg:-bottom-6 lg:w-[86%]">
@@ -118,7 +118,7 @@ export function SkinTwin({ className }: { className?: string }) {
                 <span>
                   {t.text}{" "}
                   {t.href && (
-                    <Link href={t.href} className="whitespace-nowrap text-flora underline-offset-4 hover:underline">
+                    <Link href={t.href} className="whitespace-nowrap text-flora underline underline-offset-4">
                       {t.link} →
                     </Link>
                   )}
