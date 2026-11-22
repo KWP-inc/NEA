@@ -48,6 +48,11 @@ export default async function TreatmentPage({ params }: Props) {
           <Link href="/skin-scan" className="btn-ghost">
             Not sure? Get a free scan
           </Link>
+          {site.shop && /skin-?care|products/i.test(t.slug + " " + t.title) && (
+            <a href={site.shop} target="_blank" rel="noreferrer" className="btn-ghost">
+              Shop skincare online
+            </a>
+          )}
         </div>
         <div className="mt-6">
           <AiQuestionChips context={t.title} questions={[`Is ${t.title.split(" (")[0]} right for me?`, "How many sessions will I need?", "What is the downtime?"]} />
