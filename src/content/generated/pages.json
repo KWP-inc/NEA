@@ -662,7 +662,7 @@
      },
      {
       "type": "p",
-      "text": "• Faster – Up to eight areas can be treated in each 45-minute session.• Safer – The unique truControl™ technology provides safe and consistent results through targeted, selective, and customizable delivery with less energy needed.• Effective – Three treatment mode options are available to customize the results to each patient’s goals.• Muscle thickness increase – Clinical studies have shown an average of 30% increase in muscle mass.• Versatile – Best of all, I can personalize the treatment for different fitness levels, body shapes and goals.Your truSculpt flex treatment consultant can provide all the details you need to make an informed decision about the procedure. Contact us today to schedule a free consultation!"
+      "text": "• Faster – Up to eight areas can be treated in each 45-minute session.• Safer – The unique truControl™ technology provides safe and consistent results through targeted, selective, and customizable delivery with less energy needed.• Effective – Three treatment mode options are available to customize the results to each patient’s goals.• Muscle thickness increase – Clinical studies have shown an average of 30% increase in muscle mass.• Versatile – Best of all, I can personalize the treatment for different fitness levels, body shapes and goals. Your truSculpt flex treatment consultant can provide all the details you need to make an informed decision about the procedure. Contact us today to schedule a free consultation!"
      }
     ]
    ]
@@ -675,8 +675,12 @@
    "more": [
     [
      {
+      "type": "h",
+      "text": "Neuromodulators Migraine Treatment"
+     },
+     {
       "type": "p",
-      "text": "Neuromodulators Migraine TreatmentIf you suffer from chronic migraines, it’s important to know you have options. Although, lifestyle changes, home remedies and many medications may be used to help prevent and treat migraines, NEA Precision Skin can give you another option – We understand the debilitating and exhausting effects migraines can have on people. NEA Precision Skin is pleased to offer migraine treatment in Calgary through the use of Cosmetic Injectables. This injectable prescription medication is used as a preventative method. Call us today to see if Cosmetic Injectables/ Neuromodulators is right for you."
+      "text": "If you suffer from chronic migraines, it’s important to know you have options. Although, lifestyle changes, home remedies and many medications may be used to help prevent and treat migraines, NEA Precision Skin can give you another option – We understand the debilitating and exhausting effects migraines can have on people. NEA Precision Skin is pleased to offer migraine treatment in Calgary through the use of Cosmetic Injectables. This injectable prescription medication is used as a preventative method. Call us today to see if Cosmetic Injectables/ Neuromodulators is right for you."
      }
     ]
    ]
@@ -689,8 +693,24 @@
    "more": [
     [
      {
+      "type": "h",
+      "text": "Laser Hair Restoration"
+     },
+     {
       "type": "p",
-      "text": "Laser Hair RestorationFotona’s Smooth Mode using the ER:YAG is used for hair restoration as it stimulates dormant hair follicles with control and gentle bulk heating. This also increase the blood flow to the scalp resulting in productions of hair growth. It is a 15-20 minute procedure with minimal discomfort and no need for numbing. For optimal results, recommended treatment is to combine platelet rich plasma (PRP) treatment 2 weeks apart.PRP – Hair RestorationPlatelet Rich Plasma (PRP) has been around for several decades and has been widely used in skin and wound healing. PRP is your own blood plasma that is enriched with platelets, making it a natural and organic option, specific to you. Our blood is made of two main components, red blood cells, and plasma. The plasma contains white blood cells and platelets, which are rich in growth factors. PRP contains several different and powerful growth factors that stimulate the healing of bone and soft tissue, as well as hair growth! Growth factors can help stimulate the activity of the hair follicles and promote new hair growth. When we inject PRP into the scalp it actually stimulates the stem cells in the hair root that turns on the hair follicle again. In addition, PRP contains six growth factors, so it stimulates blood flow to the hair follicles encouraging the hair to grow normally again. The procedure involves placing blood drawn from the client into a special machine that separates red blood cells from the plasma which is rich in platelets and contains the growth factors. The Platelet rich plasma is reinjected into the scalp to stimulate growth. Many evidence-based articles and research has shown that PRP is beneficial in increasing the hair count, hair thickness, and the growth phase of the hair cycle. The use of PRP is a great treatment option for hair thinning. When people lose hair, the follicles don’t just go away they just become dormant, and PRP can help stimulate them. Success is reported, in repeated treatments."
+      "text": "Fotona’s Smooth Mode using the ER:"
+     },
+     {
+      "type": "p",
+      "text": "YAG is used for hair restoration as it stimulates dormant hair follicles with control and gentle bulk heating. This also increase the blood flow to the scalp resulting in productions of hair growth. It is a 15-20 minute procedure with minimal discomfort and no need for numbing. For optimal results, recommended treatment is to combine platelet rich plasma (PRP) treatment 2 weeks apart."
+     },
+     {
+      "type": "h",
+      "text": "PRP – Hair Restoration"
+     },
+     {
+      "type": "p",
+      "text": "Platelet Rich Plasma (PRP) has been around for several decades and has been widely used in skin and wound healing. PRP is your own blood plasma that is enriched with platelets, making it a natural and organic option, specific to you. Our blood is made of two main components, red blood cells, and plasma. The plasma contains white blood cells and platelets, which are rich in growth factors. PRP contains several different and powerful growth factors that stimulate the healing of bone and soft tissue, as well as hair growth! Growth factors can help stimulate the activity of the hair follicles and promote new hair growth. When we inject PRP into the scalp it actually stimulates the stem cells in the hair root that turns on the hair follicle again. In addition, PRP contains six growth factors, so it stimulates blood flow to the hair follicles encouraging the hair to grow normally again. The procedure involves placing blood drawn from the client into a special machine that separates red blood cells from the plasma which is rich in platelets and contains the growth factors. The Platelet rich plasma is reinjected into the scalp to stimulate growth. Many evidence-based articles and research has shown that PRP is beneficial in increasing the hair count, hair thickness, and the growth phase of the hair cycle. The use of PRP is a great treatment option for hair thinning. When people lose hair, the follicles don’t just go away they just become dormant, and PRP can help stimulate them. Success is reported, in repeated treatments."
      }
     ]
    ]
@@ -1157,7 +1177,7 @@
    "title": "Contact Us",
    "intro": [],
    "list": [
-    "587-892-5722",
+    "825-395-3349",
     "nea@neaskincare.com",
     "Request Consultation",
     "Submit Contact Form"
