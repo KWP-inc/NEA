@@ -476,3 +476,65 @@
   0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
   50% { transform: scale(0.5) rotate(45deg); opacity: 0.6; }
 }
+
+/*
+ * Phones and tablets: no background blur on cards, chips and buttons. Over 100 blurred layers made phones
+ * redraw the page on every scroll frame (the "glitchy" feel). They get a near-solid background instead,
+ * so they look the same. The header, the bottom dock and pop-up windows keep a light blur (.keep-blur).
+ */
+@media (pointer: coarse), (max-width: 767px) {
+  .glass,
+  .surface,
+  .surface-strong,
+  .chip,
+  .btn-ghost,
+  [class*="backdrop-blur"]:not(.keep-blur) {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  .glass,
+  .surface,
+  .glass-dark {
+    background-color: rgb(255 255 255 / 0.9);
+  }
+  .glass-dark {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    background-color: rgb(255 255 255 / 0.9);
+  }
+  .keep-blur {
+    -webkit-backdrop-filter: blur(12px) saturate(1.2) !important;
+    backdrop-filter: blur(12px) saturate(1.2) !important;
+  }
+  .will-change-transform {
+    will-change: auto;
+  }
+}
+
+/* First headline: each word rises out of its mask, in plain CSS so it shows on the very first paint. */
+@keyframes split-rise {
+  from {
+    transform: translateY(105%);
+  }
+  to {
+    transform: none;
+  }
+}
+.split-rise {
+  animation: split-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .split-rise {
+    animation: none;
+  }
+}
+/* Endless animations pause while their section is off screen (set by <PauseOffscreen />). */
+[data-offscreen] *,
+[data-offscreen] {
+  animation-play-state: paused !important;
+}
+
+/* the cookie choice is hidden before first paint for people who already chose (see theme/init.ts) */
+.nea-consented #nea-consent {
+  display: none;
+}
