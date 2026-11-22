@@ -1,6 +1,6 @@
 import "server-only";
 import nodemailer, { type Transporter } from "nodemailer";
-import { env } from "./env";
+import { emailToConsole, env } from "./env";
 
 /**
  * Sends email through NEA's own SMTP server (SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, EMAIL_FROM).
@@ -36,8 +36,8 @@ ${bodyHtml}
 
 export async function sendMail(to: string, subject: string, title: string, bodyHtml: string, text: string) {
   if (!env.smtp.host) {
-    if (env.isProd) throw new Error("SMTP is not set up");
-    console.info(`\n[dev email] to=${to} subject="${subject}"\n${text}\n`);
+    if (!emailToConsole()) throw new Error("SMTP is not set up");
+    console.info(`\n[email not sent: no SMTP_HOST] to=${to} subject="${subject}"\n${text}\n`);
     return;
   }
   await transport().sendMail({ from: env.smtp.from, to, subject, text, html: wrap(title, bodyHtml) });
