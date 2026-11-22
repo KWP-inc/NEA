@@ -16,6 +16,7 @@ export function SplitReveal({
   delay = 0,
   stagger = 0.06,
   once = true,
+  instant = false,
 }: {
   text: string;
   as?: "h1" | "h2" | "h3" | "p" | "span";
@@ -24,6 +25,8 @@ export function SplitReveal({
   delay?: number;
   stagger?: number;
   once?: boolean;
+  /** For the first headline on a page: animates with plain CSS from the very first paint (no waiting for JavaScript). */
+  instant?: boolean;
 }) {
   const reduce = useReducedMotion();
   const lines = text.split("\n");
@@ -39,6 +42,11 @@ export function SplitReveal({
           const d = delay + i++ * stagger;
           return (
             <span key={wi} className="inline-block overflow-hidden pb-[0.12em] align-bottom [margin-bottom:-0.12em]">
+              {instant ? (
+                <span className={cn("split-rise inline-block", em && emClassName)} style={{ animationDelay: `${d}s` }}>
+                  {word}
+                </span>
+              ) : (
               <motion.span
                 className={cn("inline-block will-change-transform", em && emClassName)}
                 initial={reduce ? false : { y: "105%", opacity: 0 }}
@@ -48,6 +56,7 @@ export function SplitReveal({
               >
                 {word}
               </motion.span>
+              )}
               {" "}
             </span>
           );

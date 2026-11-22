@@ -27,7 +27,7 @@ export function HomeHero() {
           <p className="eyebrow flex items-center gap-2">
             <span className="h-px w-8 bg-ink/30" /> Physician-managed skin clinic · Calgary
           </p>
-          <SplitReveal as="h1" text={"Healthy skin\nstarts *inside.*"} className="mt-6 font-display text-[clamp(3.4rem,7vw,7rem)] leading-[0.92] tracking-[-0.025em] text-ink" />
+          <SplitReveal as="h1" instant text={"Healthy skin\nstarts *inside.*"} className="mt-6 font-display text-[clamp(3.4rem,7vw,7rem)] leading-[0.92] tracking-[-0.025em] text-ink" />
           <p className="mt-6 flex flex-wrap items-baseline gap-x-2 text-[17px] text-graphite">
             <span>We measure your</span>
             <TypingAnimation className="font-medium text-ink" caretClassName="bg-flora" words={["gut microbiome.", "hormones.", "vitamins and nutrition.", "skin, layer by layer.", "biological age."]} />
@@ -61,7 +61,7 @@ export function HomeHero() {
               </div>
             ))}
           </dl>
-          <p className="mt-6 text-[12.5px] text-graphite/80">Open Monday to Saturday, 9 to 5 · {site.address.line1}, Calgary</p>
+          <p className="mt-6 text-[12.5px] text-graphite">Open Monday to Saturday, 9 to 5 · {site.address.line1}, Calgary</p>
         </div>
 
         <GlowDrop className="order-1 lg:order-2" />
