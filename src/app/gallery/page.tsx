@@ -9,7 +9,7 @@ export const metadata = pageMeta({ title: "Clinic gallery", description: "Explor
 export default function GalleryPage() {
   return (
     <>
-      <PageHero trail={[{ name: "Gallery", path: "/gallery" }]} title="Explore our clinic." lede="Recent photos of the NEA clinic space and our clients. Scroll to turn the sphere, or browse the grid below." />
+      <PageHero trail={[{ name: "Gallery", path: "/gallery" }]} title="Explore our clinic." lede="Recent photos of the NEA clinic space and our clients. Scroll or swipe through the photos, or browse the grid below." />
       <ScrollSphereGallery cards={galleryCards} />
       <section className="chapter">
         <div className="container columns-2 gap-4 md:columns-3 lg:columns-4">
