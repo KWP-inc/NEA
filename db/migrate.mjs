@@ -4,6 +4,7 @@
  *   DATABASE_OWNER_URL=postgres://owner:…@host:5432/nea npm run db:migrate
  * Optional: NEA_APP_PASSWORD sets the password of the `nea_app` role the website uses.
  */
+import "../scripts/load-env.mjs";
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
