@@ -4,6 +4,7 @@
  *   DATABASE_OWNER_URL=postgres://… node scripts/create-admin.mjs owner@neaskincare.com "Arsh"
  * Then: open https://<site>/<ADMIN_PATH>, sign in with the email code, and set up two-step sign-in.
  */
+import "./load-env.mjs";
 import pg from "pg";
 
 const [email, name = ""] = process.argv.slice(2);
