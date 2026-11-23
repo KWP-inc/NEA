@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /** Daily housekeeping (run by cron once a day). Same as POST /api/cron/maintenance.
  *   DATABASE_URL=… node scripts/db-maintain.mjs */
+import "./load-env.mjs";
 import pg from "pg";
 const url = process.env.DATABASE_URL || process.env.DATABASE_OWNER_URL;
 if (!url) {
